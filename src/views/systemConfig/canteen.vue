@@ -1,0 +1,323 @@
+<template>
+  <div class="appContainer">
+    <div class="mainWrapper">
+      <div class="mainHeader">
+        <span class="title">食堂查询</span>
+        <el-form class="searchBar" ref="queryParams" :model="queryParams" label-width="80px" label-position="top">
+          <el-form-item label="" prop="name">
+            <el-input v-model="queryParams.name" placeholder="请输入食堂名称" />
+          </el-form-item>
+          <div class="btnGroup">
+            <el-button type="primary" size="mini" @click="queryList('queryParams')">查询</el-button>
+            <el-button type="primary" plain size="mini" @click="resetData('queryParams')">重置</el-button>
+          </div>
+        </el-form>
+      </div>
+    </div>
+    <div class="mainWrapper">
+      <div class="mainHeader mainHeader1">
+        <span class="title">食堂列表</span>
+        <div class="searchBar">
+          <el-button type="primary" @click="addCanteenFn()"><i class="el-icon-plus"></i>新增</el-button>
+        </div>
+      </div>
+      <div class="mainContent">
+        <el-table ref="multipleTable" :data="tables" border fit highlight-current-row>
+          <el-table-column type="index" label="序号" width="70px" align="center" />
+          <el-table-column prop="name" label="名称" align="center" sortable />
+          <el-table-column prop="address" label="地址" align="center" sortable />
+          <el-table-column label="操作" width="200px" align="center">
+            <template slot-scope="scope">
+              <div class="optWrap" v-if="scope.row.accountState != 3">
+                <p class="optBtn optBtn2" @click="editFn(scope.row)">编辑</p>
+                <p class="optBtn optBtn3" @click="deleteFn(scope.row)">删除</p>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!--分页-->
+        <div class="paginationWrap">
+          <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handelSizeChange"
+            @current-change="handelCurrentChange" />
+        </div>
+      </div>
+    </div>
+    <el-dialog :title="title" :visible.sync="formVisit" :close-on-click-modal="false" :close-on-press-escape="false"
+      @close="closeDialog('form')" width="50%">
+      <el-form ref="form" class="dialogBody" :rules="AddEditRules" :model="form" label-width="100px"
+        label-position="right">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="食堂名称" prop="name">
+              <el-input v-model="form.name" placeholder="请输入名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="食堂地址" prop="address">
+              <el-input v-model="form.address" placeholder="请输入地址" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="核销机选择">
+              <el-table ref="machineTable" empty-text='暂无可用核销机数据' row-key="id" :data="machineTables"
+                @selection-change="handleSelectionChange" border fit highlight-current-row>
+                <el-table-column type="selection" :reserve-selection="true" width="55">
+                </el-table-column>
+                <el-table-column type="index" width="55" label="序号" align="center" />
+                <el-table-column prop="machineName" label="核销机名称" align="center" sortable />
+              </el-table>
+              <!--分页-->
+              <div class="paginationWrap">
+                <el-pagination :current-page.sync="machineCurrentPage" :page-sizes="[5, 10, 15, 20]"
+                  :page-size="machinePageSize" layout="total, sizes, prev, pager, next, jumper" :total="machineTotal"
+                  @size-change="machineSizeChange" @current-change="machineCurrentChange" />
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog('form')">取 消</el-button>
+        <el-button type="primary" @click="onSubmit('form')">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { apiDelete, apiGet, apiPost, apiPut } from '@/utils/request.js'
+
+export default {
+  data() {
+    return {
+      // 表格数据
+      total: 0, // 模板表格总数
+      currentPage: 1, // 模板表格当前页码
+      pageSize: 10, // 模板表格整页大小
+
+      // 核销机表格数据
+      machineTotal: 0, // 模板表格总数
+      machineCurrentPage: 1, // 模板表格当前页码
+      machinePageSize: 5, // 模板表格整页大小
+
+      queryParams: {
+        // 获取模板参数
+        page: 1,
+        pageSize: 10,
+        name: null,
+      },
+
+      machineQueryParams: {
+        // 获取模板参数
+        page: 1,
+        pageSize: 5,
+        keyWord: '',
+      },
+
+      // 模板表格数据
+      tables: [],
+      // 核销机表格数据
+      machineTables: [],
+      formVisit: false, // 是否新增编辑弹窗
+      AddEditRules: {
+        name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+        address: [{ required: true, message: '请输入地址', trigger: 'blur' }],
+      },
+      form: {},
+      title: '新增模板', // 新增编辑详情弹窗标题
+
+      operation: '/business/canteen',
+
+      selectionSet: [],
+      machineIds: new Set(),
+      state: '',
+      viewdPages: new Set(),
+    }
+  },
+  mounted() {
+    this.getList()
+  },
+  methods: {
+    handleSelectionChange(val) {
+      console.log(val)
+
+      let curIdList = val.map((item) => item.id)
+
+      if (this.state == 'edit') {
+        if (curIdList.length > this.selectionSet.length) {
+          let preIdSet = new Set(this.selectionSet)
+          curIdList.forEach((id) => {
+            if (!preIdSet.has(id)) {
+              this.machineIds.add(id)
+            }
+          })
+        } else {
+          let curIdSet = new Set(curIdList)
+          this.selectionSet.forEach((id) => {
+            if (!curIdSet.has(id)) {
+              this.machineIds.delete(id)
+            }
+          })
+        }
+      }
+
+      this.selectionSet = curIdList
+    },
+
+    // 获取模板表格
+    getList() {
+      apiGet(this, this.operation, this.queryParams).then((res) => {
+        this.tables = res.data
+        this.total = res.total
+      })
+    },
+    // 获取核销机表格数据
+    availableMachineList() {
+      apiGet(
+        this,
+        '/business/checkMachine/availableList',
+        this.machineQueryParams
+      ).then((res) => {
+        this.machineTables = res.data
+        this.machineTotal = res.total
+
+        if (
+          this.state == 'edit' &&
+          !this.viewdPages.has(this.machineQueryParams.page)
+        ) {
+          this.machineTables.forEach((item) => {
+            if (this.machineIds.has(item['id'])) {
+              this.$refs.machineTable.toggleRowSelection(item, true)
+            }
+          })
+        }
+
+        this.viewdPages.add(this.machineQueryParams.page)
+      })
+    },
+
+    // 查询详情
+    getDetails(row) {
+      apiGet(this, this.operation + '/details', { id: row.id }).then((res) => {
+        this.form = Object.assign({}, res.data)
+        this.machineIds = new Set(row.machineIds)
+        this.machineQueryParams.keyWord = row.id
+
+        this.availableMachineList()
+      })
+    },
+    // page变化getList()触动函数
+    handelSizeChange(val) {
+      this.queryParams.pageSize = val
+      this.getList()
+    },
+    // pageSize变化getList()触动函数
+    handelCurrentChange(val) {
+      this.queryParams.page = val
+      this.getList()
+    },
+
+    // 核销机表格
+    // page变化getList()触动函数
+    machineSizeChange(val) {
+      this.machineQueryParams.pageSize = val
+      this.availableMachineList()
+    },
+    // pageSize变化getList()触动函数
+    machineCurrentChange(val) {
+      this.machineQueryParams.page = val
+      this.availableMachineList()
+    },
+
+    // 搜索栏查询
+    queryList: function (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.getList()
+        } else {
+          return false
+        }
+      })
+    },
+    onSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.title === '新增模板') {
+            if (this.selectionSet.length < 1) {
+              this.$message.error('请选择核销机')
+              return false
+            }
+
+            this.form.machineIds = this.selectionSet
+
+            apiPost(this, this.operation, this.form).then((res) => {
+              this.getList()
+              this.closeDialog(formName)
+            })
+          } else if (this.title === '编辑模板') {
+            if (this.machineIds.size < 1) {
+              this.$message.error('请选择核销机')
+              return false
+            }
+
+            this.form.machineIds = [...this.machineIds]
+
+            apiPut(this, this.operation, this.form).then((res) => {
+              this.getList()
+              this.closeDialog(formName)
+            })
+          }
+        } else {
+          return false
+        }
+      })
+    },
+    // 搜索栏重置
+    resetData(formName) {
+      this.$refs[formName].resetFields()
+      this.getList()
+    },
+    // 打开新增编辑弹窗
+    addCanteenFn(falg) {
+      this.title = '新增模板'
+      this.formVisit = true
+      this.machineQueryParams.keyWord = ''
+      this.availableMachineList()
+      this.state = 'add'
+    },
+    // 打开修改弹窗
+    editFn(row) {
+      this.formVisit = true
+      this.getDetails(row)
+      this.title = '编辑模板'
+      this.state = 'edit'
+    },
+    // 删除模板
+    deleteFn(row) {
+      let params = {
+        id: row.id,
+      }
+      apiDelete(this, this.operation, params).then((res) => {
+        this.getList()
+      })
+    },
+    // 关闭新增、编辑、变更记录弹窗
+    closeDialog(formName) {
+      this.$refs[formName].resetFields()
+      this.$refs['machineTable'].clearSelection()
+      this.formVisit = false
+
+      this.machineCurrentPage = 1
+      this.machinePageSize = 5
+      this.machineQueryParams = {
+        // 获取模板参数
+        page: 1,
+        pageSize: 5,
+        keyWord: '',
+      }
+      this.viewdPages.clear()
+    },
+  },
+}
+</script>

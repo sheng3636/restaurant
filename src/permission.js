@@ -10,7 +10,7 @@ import {
 } from '@/utils/auth' // 从cookie获取token
 import getPageTitle from '@/utils/get-page-title'
 // const _import = require('./router/_import_' + process.env.NODE_ENV)//获取组件的方法
-import Layout from '@/layout'
+// import Layout from '@/layout'
 
 
 function checkExist(list, path, obj){
@@ -70,7 +70,6 @@ router.beforeEach(async (to, from, next) => {
       const hasGetUserInfo = store.getters.name
       
       if (hasGetUserInfo) {
-        console.log(4)
         next()
       } else {
         if (whiteList.indexOf(to.path) !== -1) {
@@ -80,26 +79,26 @@ router.beforeEach(async (to, from, next) => {
             // 获取用户信息
             await store.dispatch('user/getInfo')
             
-            let routerData=filterAsyncRouter(store.getters.menus)
+            // let routerData=filterAsyncRouter(store.getters.menus)
              
-            router.options.routes = routerData
-            router.addRoutes(routerData); // 动态添加可访问路由表
+            // router.options.routes = routerData
+            // router.addRoutes(routerData); // 动态添加可访问路由表
 
             // 因有退出重新登录时，记录回传地址功能
             // 若用户退出后，切换登录账户，检测回传地址是否在用户权限之内
-            let obj = {flag: false}
-            checkExist(routerData,to.path,obj)
+            // let obj = {flag: false}
+            // checkExist(routerData,to.path,obj)
 
-            if(obj.flag){
-              next({ ...to, replace: true })
-            }else{
-              next({
-                path: '/'
-              })
-            }
+            // if(obj.flag){
+            //   next({ ...to, replace: true })
+            // }else{
+            //   next({
+            //     path: '/'
+            //   })
+            // }
 
             
-            //next()
+            next()
           } catch (error) {
             // 删除token，进入登录页面重新登录
             await store.dispatch('user/resetToken')

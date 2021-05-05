@@ -2,18 +2,22 @@
   <el-container class="appContainer">
     <el-aside width="300px">
       <div class="mainWrapper">
-        <div class="mainHeader">组织机构</div>
-        <div class="main-content">
+        <div class="mainHeader mainHeader1">
+          <span class="title">组织机构</span>
+        </div>
+        <div class="mainContent">
           <el-tree :data="menusTreeList" v-loading="treeLoading" :props="defaultProps" highlight-current node-key="id"
             ref="tree" default-expand-all :expand-on-click-node="false" :filter-node-method="filterNode"
             @node-contextmenu='rihgtClick' @node-click='deptNodeClick'>
             <span class="slot-t-node" slot-scope="{ node, data }">
               <span v-show="!node.isEdit">
                 <span v-show="data.children && data.children.length >= 1">
-                  <span :class="[data.id >= maxexpandId ? 'slot-t-node--label' : '']">{{node.label}}（{{node.data.hasChild}}人）</span>
+                  <span
+                    :class="[data.id >= maxexpandId ? 'slot-t-node--label' : '']">{{node.label}}（{{node.data.hasChild}}人）</span>
                 </span>
                 <span v-show="!data.children || data.children.length == 0">
-                  <span :class="[data.id >= maxexpandId ? 'slot-t-node--label' : '']">{{node.label}}（{{node.data.hasChild}}人）</span>
+                  <span
+                    :class="[data.id >= maxexpandId ? 'slot-t-node--label' : '']">{{node.label}}（{{node.data.hasChild}}人）</span>
                 </span>
               </span>
             </span>
@@ -78,22 +82,19 @@
               <el-button type="primary" @click="saveDept('editDeptForm')">确 定</el-button>
             </span>
           </el-dialog>
-
         </div>
       </div>
     </el-aside>
 
     <el-main width="70%">
       <div class="mainWrapper">
-        <div class="main-header box">
-          <el-row>
-            <el-col :span="4">用户信息</el-col>
-            <el-col :span="20" class="tableHeadRow">
-              <el-button type="primary" size="mini" @click="addUserFn">新增</el-button>
-            </el-col>
-          </el-row>
+        <div class="mainHeader mainHeader1">
+          <span class="title">用户信息</span>
+          <div class="searchBar">
+            <el-button type="primary" @click="addUserFn()"><i class="el-icon-plus"></i>新增</el-button>
+          </div>
         </div>
-        <div class="main-content">
+        <div class="mainContent">
           <el-table :data="userList" border class="table" ref="multipleTable" header-cell-class-name="table-header">
             <el-table-column prop="dept.deptName" label="部门" align="center"> </el-table-column>
             <el-table-column prop="loginName" label="姓名" align="center"> </el-table-column>
@@ -125,9 +126,11 @@
 
           </el-table>
           <!--分页-->
-          <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
+          <div class="paginationWrap">
+            <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
+              @current-change="handleCurrentChange" />
+          </div>
         </div>
       </div>
     </el-main>
@@ -151,7 +154,7 @@
               <el-input v-model="editUserForm.loginName" :disabled="editUserTitle === '编辑用户'" />
             </el-form-item>
           </el-col>
-          <el-col :span="8"  v-if="editUserTitle==='编辑用户'">
+          <el-col :span="8" v-if="editUserTitle==='编辑用户'">
             <el-form-item label="原密码" prop="oldPassword">
               <el-input v-model="editUserForm.oldPassword" :type="passwordType1" />
               <span class="show-pwd" @click="showPwdFn1">
@@ -159,7 +162,7 @@
               </span>
             </el-form-item>
           </el-col>
-          <el-col :span="8" >
+          <el-col :span="8">
             <el-form-item label="新密码" prop="password">
               <el-input v-model="editUserForm.password" :type="passwordType2" />
               <span class="show-pwd" @click="showPwdFn2">
@@ -167,7 +170,7 @@
               </span>
             </el-form-item>
           </el-col>
-          <el-col :span="8" >
+          <el-col :span="8">
             <el-form-item label="确认密码" prop="checkPass">
               <el-input v-model="editUserForm.checkPass" :type="passwordType3" />
               <span class="show-pwd" @click="showPwdFn3">
@@ -240,49 +243,62 @@
 </template>
 
 <script>
-import {apiGet,apiPost, apiPut, apiDelete, apiPutCustom} from '@/utils/request.js'
+import {
+  apiGet,
+  apiPost,
+  apiPut,
+  apiDelete,
+  apiPutCustom,
+} from '@/utils/request.js'
 import { isValidPaVss } from '@/utils/validate'
 export default {
   data() {
-    var validateOldPass=(rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('请输入原密码'))
-        } else if(!isValidPaVss(value)){
-          callback(new Error('请输入8-16位字符，至少包含数字、大写字母、小写字母、特殊字符中的三种类型'))
-        } else {
-          let checkParams={
-            userId:this.editUserForm.userId,
-            password:this.editUserForm.oldPassword
-          }
-          apiGet(this, '/system/user/checkPassWord', checkParams).then(res => {
-            console.log(res) 
-            if(res.code!==0){
-              callback(new Error(res.message))
-            }else{
-              callback()
-            }
-          })
-          
+    var validateOldPass = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请输入原密码'))
+      } else if (!isValidPaVss(value)) {
+        callback(
+          new Error(
+            '请输入8-16位字符，至少包含数字、大写字母、小写字母、特殊字符中的三种类型'
+          )
+        )
+      } else {
+        let checkParams = {
+          userId: this.editUserForm.userId,
+          password: this.editUserForm.oldPassword,
         }
+        apiGet(this, '/system/user/checkPassWord', checkParams).then((res) => {
+          console.log(res)
+          if (res.code !== 0) {
+            callback(new Error(res.message))
+          } else {
+            callback()
+          }
+        })
+      }
     }
     var validatePass = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('请输入密码'))
-        } else if(!isValidPaVss(value)){
-          callback(new Error('请输入8-16位字符，至少包含数字、大写字母、小写字母、特殊字符中的三种类型'))
-        } else {
-          callback()
-        }
+      if (!value) {
+        return callback(new Error('请输入密码'))
+      } else if (!isValidPaVss(value)) {
+        callback(
+          new Error(
+            '请输入8-16位字符，至少包含数字、大写字母、小写字母、特殊字符中的三种类型'
+          )
+        )
+      } else {
+        callback()
+      }
     }
     var validatePass2 = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入密码'));
-        } else if (value !== this.editUserForm.password) {
-          callback(new Error('两次输入密码不一致!'));
-        } else {
-          callback();
-        }
-      };
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.editUserForm.password) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
     return {
       passwordType1: 'password',
       passwordType2: 'password',
@@ -294,7 +310,7 @@ export default {
       defaultProps: {
         // 树形菜单配置项
         children: 'children',
-        label: 'name'
+        label: 'name',
       },
       menusTreeList: [], // 菜单节点树数据
       menuVisible: false, // 鼠标右键点击菜单节点出现页面
@@ -304,11 +320,11 @@ export default {
       editDeptForm: {}, // 新增编辑组织机构表单
       editDeptrules: {
         deptName: [
-          { required: true, message: '组织名称不能为空', trigger: 'blur' }
+          { required: true, message: '组织名称不能为空', trigger: 'blur' },
         ],
         deptCode: [
-          { required: true, message: '组织编码不能为空', trigger: 'blur' }
-        ]
+          { required: true, message: '组织编码不能为空', trigger: 'blur' },
+        ],
       },
 
       total: 0, // 用户信息表格总数
@@ -318,7 +334,7 @@ export default {
         // 获取用户列表参数
         page: 1,
         pageSize: 10,
-        deptId: ''
+        deptId: '',
       },
       userList: [], // 用户信息表格数据
 
@@ -327,19 +343,19 @@ export default {
       editUserRules: {
         // 新增编辑用户表单验证规则
         deptName: [
-          { required: true, message: '部门不能为空', trigger: 'blur' }
+          { required: true, message: '部门不能为空', trigger: 'blur' },
         ],
         loginName: [
-          { required: true, message: '登录名不能为空', trigger: 'blur' }
+          { required: true, message: '登录名不能为空', trigger: 'blur' },
         ],
         oldPassword: [
-          { required: true, trigger: 'blur', validator: validateOldPass }
+          { required: true, trigger: 'blur', validator: validateOldPass },
         ],
         password: [
-          { required: true, trigger: 'blur', validator: validatePass }
+          { required: true, trigger: 'blur', validator: validatePass },
         ],
         checkPass: [
-          { required: true,validator: validatePass2, trigger: 'blur' }
+          { required: true, validator: validatePass2, trigger: 'blur' },
         ],
       },
       editUserForm: {}, // 新增编辑用户表单
@@ -347,7 +363,7 @@ export default {
       roleVisi: false, // 角色授权弹窗是否显示
       roleForm: {}, // 角色授权表单
       checkList: [], // 角色列表
-      checkedItems: [] // 被选中角色
+      checkedItems: [], // 被选中角色
     }
   },
   mounted() {
@@ -356,7 +372,7 @@ export default {
   methods: {
     // 获取组织机构树
     getDeptListFn() {
-      apiGet(this, 'system/dept/list', this.queryParams).then(res => {
+      apiGet(this, 'system/dept/list', this.queryParams).then((res) => {
         this.menusTreeList = res.data
         this.treeLoading = false
       })
@@ -376,7 +392,7 @@ export default {
       } else {
         this.menuVisible = !this.menuVisible
       }
-      document.addEventListener('click', e => {
+      document.addEventListener('click', (e) => {
         this.menuVisible = false
       })
       const menu = document.querySelector('#rightClickMenu')
@@ -427,10 +443,10 @@ export default {
     // 获取组织详情
     getDeptDetailsFn(type, level, preDeptName, deptId) {
       let params = {
-        deptId: deptId
+        deptId: deptId,
       }
       this.editDeptForm.preDeptName = preDeptName
-      apiGet(this, 'system/dept/details', params).then(res => {
+      apiGet(this, 'system/dept/details', params).then((res) => {
         if (type == 'add') {
           this.editDeptForm.preDept = { deptId: res.data.dept.id }
           this.editDeptForm.dLevel = level + 1
@@ -442,15 +458,15 @@ export default {
     },
     // 新增、新增组织
     saveDept(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.editDeptTitle === '修改组织机构') {
-            apiPut(this, 'system/dept', this.editDeptForm).then(res => {
+            apiPut(this, 'system/dept', this.editDeptForm).then((res) => {
               this.closeDialog('editDeptForm')
               this.getDeptListFn()
             })
           } else {
-            apiPost(this, 'system/dept', this.editDeptForm).then(res => {
+            apiPost(this, 'system/dept', this.editDeptForm).then((res) => {
               this.closeDialog('editDeptForm')
               this.getDeptListFn()
             })
@@ -470,9 +486,9 @@ export default {
         return false
       } else {
         let params = {
-          deptId: d.id
+          deptId: d.id,
         }
-        apiDelete(this, 'system/dept', params).then(res => {
+        apiDelete(this, 'system/dept', params).then((res) => {
           this.getDeptListFn()
         })
       }
@@ -486,7 +502,7 @@ export default {
     },
     // 获取用户列表
     getDeptUsersFn() {
-      apiGet(this, 'system/user', this.queryParams).then(res => {
+      apiGet(this, 'system/user', this.queryParams).then((res) => {
         this.total = res.total
         this.userList = res.data
       })
@@ -529,22 +545,22 @@ export default {
       this.editUserForm = {
         deptName: this.DATA.name,
         dept: {
-          deptId: this.DATA.id
-        }
+          deptId: this.DATA.id,
+        },
       }
       this.editUserVisible = true
     },
     // 新增编辑用户
     updateUser(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.editUserTitle == '编辑用户') {
-            apiPut(this, 'system/user', this.editUserForm).then(res => {
+            apiPut(this, 'system/user', this.editUserForm).then((res) => {
               this.getDeptUsersFn()
               this.closeDialog('editUserForm')
             })
           } else {
-            apiPost(this, 'system/user', this.editUserForm).then(res => {
+            apiPost(this, 'system/user', this.editUserForm).then((res) => {
               this.getDeptUsersFn()
               this.closeDialog('editUserForm')
             })
@@ -560,23 +576,23 @@ export default {
       this.editUserTitle = '编辑用户'
       this.editUserForm = row
       this.editUserForm.deptName = row.dept.deptName
-      this.editUserForm.password=''
+      this.editUserForm.password = ''
       this.editUserVisible = true
     },
     // 禁用用户
     forbiddenUser(row) {
       let params = { userId: row.userId, accountState: 3 }
-      apiPut(this, 'system/user/handleAccount', params).then(res => {
+      apiPut(this, 'system/user/handleAccount', params).then((res) => {
         this.getDeptUsersFn()
       })
     },
     // 启用用户
     enableUser(row) {
       this.$confirm('确定要启用吗？', '提示', {
-        type: 'warning'
+        type: 'warning',
       }).then(() => {
         let params = { userId: row.userId, accountState: 0 }
-        apiPut(this, 'system/user/handleAccount', params).then(res => {
+        apiPut(this, 'system/user/handleAccount', params).then((res) => {
           this.getDeptUsersFn()
         })
       })
@@ -584,7 +600,7 @@ export default {
     // 删除用户
     delUser(row) {
       let params = { userId: row.userId }
-      apiDelete(this, 'system/user', params).then(res => {
+      apiDelete(this, 'system/user', params).then((res) => {
         this.getDeptUsersFn()
       })
     },
@@ -596,7 +612,7 @@ export default {
         'system/user/resetPassword',
         params,
         '你确定重置所选帐号的密码？重置后的密码为"New@0987"'
-      ).then(res => {
+      ).then((res) => {
         this.getDeptUsersFn()
       })
     },
@@ -605,11 +621,9 @@ export default {
       this.roleForm = row
       this.checkedItems = []
       let params = { userId: row.userId }
-      apiGet(this, 'system/user/showChooseRole', params).then(res => {
-         
-          this.checkList = res.data.chooseList?res.data.chooseList:[]
-          this.checkedItems = res.data.choosedList?res.data.choosedList:[]
-        
+      apiGet(this, 'system/user/showChooseRole', params).then((res) => {
+        this.checkList = res.data.chooseList ? res.data.chooseList : []
+        this.checkedItems = res.data.choosedList ? res.data.choosedList : []
       })
       this.roleVisi = true
     },
@@ -617,9 +631,9 @@ export default {
     roleAuthorization(data) {
       let params = {
         userId: this.roleForm.userId,
-        arrId: this.checkedItems
+        arrId: this.checkedItems,
       }
-      apiPut(this, 'system/user/chooseRole', params).then(res => {
+      apiPut(this, 'system/user/chooseRole', params).then((res) => {
         this.closeDialog('roleForm')
         this.getDeptUsersFn()
       })
@@ -646,7 +660,7 @@ export default {
         this.passwordType3 = 'password'
       }
     },
-  }
+  },
 }
 </script>
 

@@ -2,17 +2,13 @@
   <el-container class="appContainer">
     <el-aside width="300px">
       <div class="mainWrapper">
-        <div class="main-header">
-          <el-row>
-            <el-col :md="10">
-              模块菜单
-            </el-col>
-            <el-col :md="4" :offset="10" class="treeBtnGroup">
-              <el-button type="primary" size="mini" @click="addRootMenu">新增</el-button>
-            </el-col>
-          </el-row>
+        <div class="mainHeader mainHeader1">
+          <span class="title">模块菜单</span>
+          <div class="searchBar">
+            <el-button type="primary" @click="addRootMenu()"><i class="el-icon-plus"></i>新增</el-button>
+          </div>
         </div>
-        <div class="main-content">
+        <div class="mainContent">
           <el-tree :data="menusTreeList" v-loading="treeLoading" :props="defaultProps" highlight-current node-key="id"
             ref="menusTree" default-expand-all @node-contextmenu='rightClick' @node-click='nodeClick'>
             <span class="slot-t-node" slot-scope="{ node, data }">
@@ -111,18 +107,15 @@
 
     <el-main width="70%">
       <div class="mainWrapper">
-        <div class="main-header box">
-          <el-row>
-            <el-col :md="6">
-              权限信息
-            </el-col>
-            <el-col :md="18" class="tableHeadRow">
-              <el-button type="primary" size="mini" @click="addAuthority">新增</el-button>
-            </el-col>
-          </el-row>
+        <div class="mainHeader mainHeader1">
+          <span class="title">权限信息</span>
+          <div class="searchBar">
+            <el-button type="primary" @click="addAuthority()"><i class="el-icon-plus"></i>新增</el-button>
+          </div>
         </div>
-        <div class="main-content">
+        <div class="mainContent">
           <el-table :data="permissionList" border class="table">
+            <el-table-column type="index" label="序号" width="70px" align="center" />
             <el-table-column prop="autName" label="权限名称" align="center"> </el-table-column>
             <el-table-column prop="menu.menuName" label="模块" align="center"> </el-table-column>
             <el-table-column label="操作" width="180" align="center">
@@ -141,10 +134,11 @@
             </el-table-column>
           </el-table>
           <!--分页-->
-          <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
-
+          <div class="paginationWrap">
+            <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
+              @current-change="handleCurrentChange" />
+          </div>
           <!-- 添加编辑弹出框 -->
           <el-dialog :title="authTitle" :visible.sync="authorityVisible" width="40%" :close-on-click-modal="false"
             @close="closeDialog('authForm')">
@@ -208,15 +202,15 @@
 import { apiGet, apiPost, apiPut, apiDelete } from '@/utils/request'
 export default {
   data() {
-    ///     
+    ///
     var validate = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('请输入可访问url'))
+      if (!value) {
+        return callback(new Error('请输入可访问url'))
         // } else if(!/((^(\/(\w+)|(\d+))\\|(\w{3,4})\n*)+)$/.test){
         //   callback(new Error('请检查输入url'))
-        } else {
-          callback()
-        }
+      } else {
+        callback()
+      }
     }
     return {
       maxexpandId: 95,
@@ -226,35 +220,36 @@ export default {
       defaultProps: {
         // 树形菜单配置项
         children: 'children',
-        label: 'label'
+        label: 'label',
       },
       menusTreeList: [], // 菜单节点树数据
       menuVisible: false, // 鼠标右键点击菜单节点出现页面
       editMenuVisible: false, // 新增编辑菜单弹窗是否显示
       isPreMenuShow: false, // 新增菜单是否为根菜单
       menuTitle: '新增菜单', // 新增编辑菜单标题
-      YNOpts:[ // true、false下拉框
+      YNOpts: [
+        // true、false下拉框
         {
-          value:0,
-          label:'是'
+          value: 0,
+          label: '是',
         },
         {
-          value:1,
-          label:'否'
-        }
+          value: 1,
+          label: '否',
+        },
       ],
       menusForm: {
         // 新增编辑菜单表单
         preMenu: {
-          menuName: ''
-        }
+          menuName: '',
+        },
       },
       menusRules: {
         // 新增编辑菜单表单验证规则
         menuName: [
           { required: true, message: '不能为空', trigger: 'blur' },
           { required: true, message: '不能为空', trigger: 'change' },
-        ]
+        ],
       },
       total: 0, // 权限信息表格总数
       currentPage: 1, // 权限信息分页当前页码
@@ -262,7 +257,7 @@ export default {
       queryParams: {
         // 权限信息查询参数
         page: 1,
-        pageSize: 10
+        pageSize: 10,
       },
       permissionList: [], // 权限表格数据
 
@@ -271,13 +266,19 @@ export default {
       authorityForm: {
         // 新增编辑功能权限表单
         autType: 0,
-        menu: {}
+        menu: {},
       },
       authorityRules: {
         // 新增修改权限表单验证规则
-        autName: [{ required: true, message: '权限名称不能为空', trigger: 'blur' }],
-        autType: [{ required: true, message: '权限类型不能为空', trigger: 'blur' }],
-        autUrlMethod: [{ required: true, trigger: 'blur', validator: validate }]
+        autName: [
+          { required: true, message: '权限名称不能为空', trigger: 'blur' },
+        ],
+        autType: [
+          { required: true, message: '权限类型不能为空', trigger: 'blur' },
+        ],
+        autUrlMethod: [
+          { required: true, trigger: 'blur', validator: validate },
+        ],
       },
       // authTableOption: [], // 权限表下拉框
       // authTypeOption: [
@@ -295,7 +296,7 @@ export default {
   methods: {
     // 获取菜单树
     getMenuListFn() {
-      apiGet(this, 'system/menu/info').then(res => {
+      apiGet(this, 'system/menu/info').then((res) => {
         this.menusTreeList = res.data
         this.treeLoading = false
       })
@@ -310,7 +311,7 @@ export default {
       } else {
         this.menuVisible = !this.menuVisible
       }
-      document.addEventListener('click', e => {
+      document.addEventListener('click', (e) => {
         this.menuVisible = false
       })
       const menu = document.querySelector('#rightClickMenu')
@@ -352,8 +353,8 @@ export default {
         isRoot: 1,
         dLevel: 0,
         preMenu: {
-          menuId: 0
-        }
+          menuId: 0,
+        },
       }
     },
     // 新增菜单前处理
@@ -366,8 +367,8 @@ export default {
         dLevel: 1,
         preMenu: {
           menuName: this.DATA.label,
-          menuId: this.DATA.id
-        }
+          menuId: this.DATA.id,
+        },
       }
     },
     // 编辑菜单前处理
@@ -377,10 +378,10 @@ export default {
       }
       this.menuTitle = '修改菜单'
       var params = {
-        menuId: this.objectID
+        menuId: this.objectID,
       }
-      apiGet(this, 'system/menu/menuDetailById', params).then(res => {
-        this.$nextTick(function() {
+      apiGet(this, 'system/menu/menuDetailById', params).then((res) => {
+        this.$nextTick(function () {
           this.menusForm = res.data
           // this.menusForm.hidden=res.data.hidden == 1 ? true : false
         })
@@ -388,17 +389,17 @@ export default {
     },
     // 新增 、修改菜单请求
     saveMenuEdit(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.menusForm.hidden=this.menusForm.hidden?1:0
+          this.menusForm.hidden = this.menusForm.hidden ? 1 : 0
           if (this.menuTitle === '修改菜单') {
-            apiPut(this, '/system/menu', this.menusForm).then(res => {
+            apiPut(this, '/system/menu', this.menusForm).then((res) => {
               this.getMenuListFn()
               this.getPermissionList()
               this.closeDialog('menusForm')
             })
           } else {
-            apiPost(this, '/system/menu', this.menusForm).then(res => {
+            apiPost(this, '/system/menu', this.menusForm).then((res) => {
               this.getMenuListFn()
               this.getPermissionList()
               this.closeDialog('menusForm')
@@ -418,9 +419,9 @@ export default {
         return false
       } else {
         let params = {
-          menuId: menuItem.id
+          menuId: menuItem.id,
         }
-        apiDelete(this, '/system/menu', params).then(res => {
+        apiDelete(this, '/system/menu', params).then((res) => {
           this.getMenuListFn()
         })
       }
@@ -432,7 +433,7 @@ export default {
         this,
         'system/functionAuthority/getMenuAuthority',
         this.queryParams
-      ).then(res => {
+      ).then((res) => {
         this.total = res.total
         this.permissionList = res.data
       })
@@ -457,7 +458,7 @@ export default {
     addAuthority() {
       this.authorityForm = {
         autType: 0,
-        menu: {}
+        menu: {},
       }
       if (!this.DATA) {
         this.$message.error('请先选择模块菜单！')
@@ -471,30 +472,30 @@ export default {
         autType: 0,
         menu: {
           menuId: this.DATA.id,
-          menuName: this.DATA.label
-        }
+          menuName: this.DATA.label,
+        },
       }
     },
     // 点击修改权限
     editAuthority(row) {
       this.authTitle = '修改功能权限'
-      this.authorityForm = Object.assign({},row)
+      this.authorityForm = Object.assign({}, row)
       this.authorityVisible = true
     },
     // 新增编辑权限
     saveAuthority(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.authTitle === '修改功能权限') {
             apiPut(this, 'system/functionAuthority', this.authorityForm).then(
-              res => {
+              (res) => {
                 this.getPermissionList()
                 this.closeDialog('authForm')
               }
             )
           } else {
             apiPost(this, 'system/functionAuthority', this.authorityForm).then(
-              res => {
+              (res) => {
                 this.getPermissionList()
                 this.closeDialog('authForm')
               }
@@ -508,7 +509,7 @@ export default {
     // 删除权限
     delAuthority(row) {
       let params = { autId: row.autId }
-      apiDelete(this, 'system/functionAuthority', params).then(res => {
+      apiDelete(this, 'system/functionAuthority', params).then((res) => {
         this.getPermissionList()
       })
     },
@@ -517,8 +518,8 @@ export default {
       this.editMenuVisible = false
       this.authorityVisible = false
       this.$refs[formName].resetFields()
-    }
-  }
+    },
+  },
 }
 </script>
 

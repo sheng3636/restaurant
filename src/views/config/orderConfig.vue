@@ -121,7 +121,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="1">
-                <span style="line-height: 2.7"> — </span>
+                <span style="line-height: 2.7;text-align:center;"> — </span>
               </el-col>
               <el-col :span="9">
                 <el-form-item label="" prop="reserveEndTime" label-width="0">
@@ -169,8 +169,8 @@
                   </el-time-picker>
                 </el-form-item>
               </el-col>
-              <el-col :span="1" style="line-height: 2.7">
-                <span> — </span>
+              <el-col :span="1">
+                <span style="line-height: 2.7;text-align:center;"> — </span>
               </el-col>
               <el-col :span="9">
                 <el-form-item label="" label-width="0" prop="availableEndTime">

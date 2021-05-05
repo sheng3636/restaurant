@@ -102,9 +102,153 @@ aside {
 //   border-radius: 20px;
 // }
 
-//main-container全局样式
+
+// 页面布局全局样式
+.bodyWrapper {
+  @include wh(100%,100%);
+  width: 100%;
+  height: 100%;
+  background: #F0F2F5;
+}
+.systemHeader {
+  @include fj(space-between);
+  align-items: center;
+  padding: 0 30px;
+  margin-bottom: 20px;
+  @include wh(100%,88px);
+  background: #fff;
+  .logo {
+    width: 300px;
+    @include sc(24px,#333);
+  } 
+  .el-menu.el-menu--horizontal {
+    width: calc(100% - 300px - 205px);
+    height: 100%;
+  }
+  .el-menu--horizontal > .el-menu-item.is-active {
+    border-bottom: 2px solid #0070FF;
+    color: #0070FF;
+    font-weight: 700;
+  }
+  .el-menu--horizontal > .el-menu-item {
+    margin: 0 15px;
+    height: 100%;
+    line-height: 88px;
+    font-size: 16px;
+    color: #515151;
+  }
+  .headerUserIcon {
+    display: flex;
+    @include wh(205px,70px);
+    align-items: center;
+    .userAvator {
+      margin-left: 20px;
+      img {
+        display: block;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+      }
+    }
+    .userName {
+      margin-left: 10px;
+    }
+    .el-dropdown-link {
+      cursor: pointer;
+    }
+    .el-dropdown-menu__item {
+      text-align: center;
+    }
+  }
+}
+
+
+.appWrapper {
+  @include clearfix;
+  position: relative;
+  @include wh(100%,calc(100% - 88px - 20px));
+  /* 左侧菜单栏定位和位置大小设定 */
+  .sidebar {
+    display: block;
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 115px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar-track-piece {
+      background: #d3dce6;
+    }
+
+    &::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #99a9bf;
+      border-radius: 20px;
+    }
+  }
+  .el-menu {
+    border: none;
+  }
+  .sidebar-el-menu {
+    padding-top: 25px;
+    width: 115px;
+    .subMenuImg {
+      display: block;
+      @include wh(37px,37px);
+    }
+  }
+  .sidebar > ul {
+  //  @include wh(100%,100%);
+    min-height: 100%;
+  }
+  /* 左侧二级菜单项的样式 */
+  .el-menu-item {
+    @include fj(center);
+    align-items: center;
+    flex-direction: column;
+    padding-left: 0!important;
+    padding: 0;
+    margin: 0 auto 25px auto;
+      @include wh(90px,90px);
+    line-height: 35px;
+    font-size: 16px !important;
+    color: #141414 !important;
+    text-align:center;
+    box-sizing: border-box;
+    img {
+      @include wh(34px,34px)
+    }
+    &:hover {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      color: #00796A !important;
+      background: #F0F2F5 !important;
+    }
+  }
+  /* 左侧二级菜单选中时的样式 */
+  .el-menu-item.is-active {
+    border-radius: 10px;
+    color: #00796A !important;
+    background: #F0F2F5 !important;
+  }
+  .mainBottom {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 145px;
+    padding: 0;
+    @include wh(calc(100% - 154px),100%);
+  }
+}
 .appContainer {
-  padding: 0 20px 20px 20px;
+  padding: 0 20px 0 20px;
+  width: 100%;
 }
 .mainWrapper {
   margin-bottom: 15px;
@@ -238,12 +382,6 @@ aside {
     background-color: #ff6060;
   }
 }
-
-
-
-
-
-
 
 
 

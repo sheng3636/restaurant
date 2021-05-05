@@ -2,15 +2,13 @@
   <el-container class="appContainer">
     <el-aside width="500px">
       <div class="mainWrapper">
-        <div class="main-header">
-          <el-col :md="4" class="tableHeadRow">
-            角色信息
-          </el-col>
-          <el-col :md="20" class="tableHeadRow">
-            <el-button type="primary" size="mini" @click="addRoleClick">新增</el-button>
-          </el-col>
+        <div class="mainHeader mainHeader1">
+          <span class="title">角色信息</span>
+          <div class="searchBar">
+            <el-button type="primary" @click="addRoleClick()"><i class="el-icon-plus"></i>新增</el-button>
+          </div>
         </div>
-        <div class="main-content">
+        <div class="mainContent">
           <el-table :data="roleList" v-loading="roleLoading" border class="table" ref="multipleTable"
             header-cell-class-name="table-header">
             <el-table-column prop="roleName" label="角色名称" align="center">
@@ -36,21 +34,22 @@
             </el-table-column>
           </el-table>
           <!--分页-->
-          <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
-
+          <div class="paginationWrap">
+            <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
+              @current-change="handleCurrentChange" />
+          </div>
         </div>
       </div>
     </el-aside>
 
     <el-main width="70%">
       <div class="mainWrapper">
-        <div class="main-header box">
-          功能权限
+        <div class="mainHeader mainHeader1">
+          <span class="title">功能权限</span>
         </div>
-        <div class="main-content">
-          <el-table :data="menuData" v-loading="authLoading" border header-cell-class-name="table-header">
+        <div class="mainContent">
+          <el-table :data="menuData" v-loading="authLoading" border header-cell-class-name="table-header" max-height="720px">
             <el-table-column label="全选" align="center">
               <template slot="header" slot-scope="scope">
                 <el-checkbox v-model="checkAll" :label="scope.checkKey" @change="handleCheckAllChange">全选</el-checkbox>
@@ -96,7 +95,7 @@
       <el-form ref="roleAuthorizationForm" :model="editRoleForm" lable-position="top">
         <div class="mainWrapper">
           <div class="main-header box">基本信息</div>
-          <div class="main-content">
+          <div class="mainContent">
             <el-row>
               <el-col :span="12">
                 <el-form-item label="所属角色" prop="roleName">
@@ -128,7 +127,7 @@
         </div>
         <div class="mainWrapper" v-show="editRoleForm.execSql==='1'">
           <div class="main-header box">数据范围</div>
-          <div class="main-content">
+          <div class="mainContent">
             <el-row>
               <el-col :span="24">
                 <el-form-item label="设置数据范围(数据范围为空，表示数据范围为登录者本部门)" prop="deptNames">
@@ -156,7 +155,13 @@
 </template>
 
 <script>
-import { apiGet, apiPost, apiDefaultPut, apiPut, apiDelete } from '@/utils/request.js'
+import {
+  apiGet,
+  apiPost,
+  apiDefaultPut,
+  apiPut,
+  apiDelete,
+} from '@/utils/request.js'
 export default {
   data() {
     return {
@@ -167,13 +172,13 @@ export default {
       queryParams: {
         // 角色信息查询参数
         page: 1,
-        pageSize: 10
+        pageSize: 10,
       },
       //树
       maxexpandId: 95,
       defaultProps: {
         children: 'children',
-        label: 'name'
+        label: 'name',
       },
       //默认选中
       defaultChecked: [],
@@ -186,8 +191,8 @@ export default {
       roleFromRules: {
         // 新增编辑角色表单校验
         roleName: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' }
-        ]
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
+        ],
       },
       roleAuthorizationVisi: false, // 角色授权数据权限弹窗是否显示
       deptList: [], // 组织机构树形数据
@@ -199,7 +204,7 @@ export default {
       checkKey: '1',
       checkRows: [],
       checkedItems: [],
-      allMenuIds: []
+      allMenuIds: [],
     }
   },
   mounted() {
@@ -209,20 +214,18 @@ export default {
   methods: {
     // 获取角色表格数据
     getRoleListFn() {
-      apiGet(this, '/system/role', this.queryParams).then(res => {
+      apiGet(this, '/system/role', this.queryParams).then((res) => {
         this.roleList = res.data
         this.total = res.total
         this.roleLoading = false
       })
     },
     // 查询角色信息详情
-    getDetails(row){
+    getDetails(row) {
       console.log(row)
-      apiGet(this, '/system/role/details', {id:row.roleId}).then(
-        res => { 
-          this.editRoleForm = Object.assign({},res.data)
-        }
-      )
+      apiGet(this, '/system/role/details', { id: row.roleId }).then((res) => {
+        this.editRoleForm = Object.assign({}, res.data)
+      })
     },
     // pageSize变化getRoleListFn()触动函数
     handleSizeChange(val) {
@@ -250,19 +253,19 @@ export default {
     editRoleClick(row) {
       this.editRoleTitle = '编辑角色'
       this.getDetails(row)
-      this.editRoleVisi = true 
+      this.editRoleVisi = true
     },
     // 新增编辑角色
     editRoleSubmit(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.editRoleTitle === '编辑角色') {
-            apiPut(this, 'system/role', this.editRoleForm).then(res => {
+            apiPut(this, 'system/role', this.editRoleForm).then((res) => {
               this.closeDialog('editRoleForm')
               this.getRoleListFn()
             })
           } else {
-            apiPost(this, 'system/role', this.editRoleForm).then(res => {
+            apiPost(this, 'system/role', this.editRoleForm).then((res) => {
               this.closeDialog('editRoleForm')
               this.getRoleListFn()
             })
@@ -276,14 +279,14 @@ export default {
     // 删除角色
     deleteRoleClick(row) {
       let params = { roleId: row.roleId }
-      apiDelete(this, 'system/role', params).then(res => {
+      apiDelete(this, 'system/role', params).then((res) => {
         this.getRoleListFn()
       })
     },
 
     // 获取组织架构树
     getDeptListFn() {
-      apiGet(this, 'system/dept/list', this.queryParams).then(res => {
+      apiGet(this, 'system/dept/list', this.queryParams).then((res) => {
         this.deptList = res.data
         this.isLoadingTree = false
       })
@@ -297,15 +300,15 @@ export default {
       this.editRoleForm = row
       this.roleAuthorizationVisi = true
       let params = {
-        roleId: row.roleId
+        roleId: row.roleId,
       }
-      apiGet(this, 'system/authorize/dataPreview', params).then(res => {
+      apiGet(this, 'system/authorize/dataPreview', params).then((res) => {
         this.$set(
           this.editRoleForm,
           'isGlobal',
           res.data.isGlobal == 1 ? true : false
         )
-        if(res.data.arrId){
+        if (res.data.arrId) {
           let arr = res.data.arrId.split(',')
           this.$refs.tree.setCheckedKeys(arr)
         }
@@ -341,18 +344,18 @@ export default {
       }
     },
     // 数据权限提交
-    roleAuthorizationSubmit(formName) { 
-      let editParams={
-        roleId:this.editRoleForm.roleId,
-        roleName:this.editRoleForm.roleName,
-        deptIdArr:this.editRoleForm.deptIdArr,
-        deptNames:this.editRoleForm.deptNames,
-        authorizeId:this.editRoleForm.authorizeId,
-        execSql:this.editRoleForm.execSql,
-        memo:this.editRoleForm.memo,
+    roleAuthorizationSubmit(formName) {
+      let editParams = {
+        roleId: this.editRoleForm.roleId,
+        roleName: this.editRoleForm.roleName,
+        deptIdArr: this.editRoleForm.deptIdArr,
+        deptNames: this.editRoleForm.deptNames,
+        authorizeId: this.editRoleForm.authorizeId,
+        execSql: this.editRoleForm.execSql,
+        memo: this.editRoleForm.memo,
       }
       apiPut(this, 'system/authorize/chooseAuthorize', editParams).then(
-        res => {
+        (res) => {
           this.closeDialog('roleAuthorizationForm')
           this.getRoleListFn()
         }
@@ -364,7 +367,7 @@ export default {
       this.authLoading = true
       let params = { roleId: row.roleId }
       this.roleId = row.roleId
-      apiGet(this, 'system/role/getAuth', params).then(res => {
+      apiGet(this, 'system/role/getAuth', params).then((res) => {
         this.allMenuIds = []
         this.menuData = res.data.authList
         this.checkedItems = res.data.chooseAuthority.split(',')
@@ -391,7 +394,7 @@ export default {
     chooseRoleAuthFn() {
       let params = { roleId: this.roleId, arrID: this.checkedItems }
       console.log('b')
-      apiDefaultPut(this, 'system/role/chooseFuncAuth', params).then(res => {
+      apiDefaultPut(this, 'system/role/chooseFuncAuth', params).then((res) => {
         this.getRoleListFn()
       })
     },
@@ -410,7 +413,6 @@ export default {
     },
     // 单选
     handleCheckChange(val, row) {
-     
       if (val) {
         for (let i = 0; i < row.auth.length; i++) {
           if (this.checkedItems.indexOf(row.auth[i].autId) === -1) {
@@ -449,8 +451,8 @@ export default {
       if (m == 1) {
         this.chooseRoleAuthFn()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
