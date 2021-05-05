@@ -1,0 +1,377 @@
+<template>
+  <div class="app-container">
+    <div class="main-wrapper">
+      <div class="main-header">查询</div>
+      <div class="main-content">
+        <el-form ref="queryParams" :model="queryParams" label-width="80px" label-position="top">
+          <el-row>
+            <el-col :md="4">
+              <el-form-item label="套餐名称" prop="name">
+                <el-input v-model="queryParams.name" aria-placeholder="请输入套餐名称" />
+              </el-form-item>
+            </el-col>
+            <el-col :md="6">
+              <el-form-item class="textLeft param">
+                <el-button type="warning" size="mini" @click="queryList('queryParams')">查询
+                </el-button>
+                <el-button type="danger" size="mini" @click="resetData('queryParams')">重置
+                </el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
+    </div>
+    <div class="main-wrapper">
+      <div class="main-header">
+        <el-row>
+          <el-col :md="6"> 列表 </el-col>
+          <el-col :md="18" class="tableHeadRow">
+            <el-button type="primary" size="mini" @click="addMealFn()">新增</el-button>
+          </el-col>
+        </el-row>
+      </div>
+      <div class="main-content">
+        <el-table ref="multipleTable" :data="tables" @cell-mouse-enter="cellEnter" border fit highlight-current-row>
+          <el-table-column type="index" width="55" label="序号" align="center" />
+          <el-table-column prop="name" label="套餐名称" align="center" sortable />
+          <el-table-column prop="picAddress" label="套餐图片" align="center" sortable>
+            <template slot-scope="scope">
+              <img :src="scope.row.picAddress" style="width: 120px; height: 50px">
+            </template>
+          </el-table-column>
+          
+          <el-table-column prop="detail" label="套餐详情" align="center" sortable />
+          <el-table-column prop="price" label="价格（元）" align="center" sortable />
+          <el-table-column prop="status" label="状态" align="center" :formatter="statusFormatter" sortable >
+            <template slot-scope="scope">
+              <i-switch
+                v-model="scope.row.status"
+                :false-value="falseValue"
+                :true-value="trueValue"
+                true-color="#13ce66"
+                false-color="rgb(195, 195, 195)"
+                :before-change="handleBeforeChange"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建日期" align="center" sortable />
+          <el-table-column label="操作" width="180" align="center">
+            <template slot-scope="scope">
+              <el-dropdown>
+                <el-button type="success" size="medium">
+                  操作<i class="el-icon-arrow-down el-icon--right" />
+                </el-button>
+                <el-dropdown-menu v-if="scope.row.accountState != 3" slot="dropdown">
+                  <el-dropdown-item @click.native="editFn(scope.row)">修改</el-dropdown-item>
+                  <el-dropdown-item @click.native="deleteFn(scope.row)">删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!--分页-->
+        <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handelSizeChange" @current-change="handelCurrentChange" />
+      </div>
+    </div>
+    <el-dialog :title="title" :visible.sync="formVisit" :close-on-click-modal="false" :close-on-press-escape="false" width="30%" @close="closeDialog('form')">
+      <el-form ref="form" class="dialogBody" :rules="AddEditRules" :model="form" label-width="80px" label-position="left">
+        <el-row>
+          <el-form-item label="图片" prop="name">
+            <el-upload ref="upload" :class="{ hide: hideUpload }" list-type="picture-card" action="#" :on-change="handleChange" :on-remove="handleRemove" :on-exceed="handleExceed" :auto-upload="false" :file-list="fileList" :limit="1">
+              <i slot="default" class="el-icon-plus" />
+              <!-- <div slot="file" slot-scope="{ file }">
+                <img
+                  class="el-upload-list__item-thumbnail"
+                  :src="file.url"
+                  alt=""
+                />
+                <span class="el-upload-list__item-actions">
+                  <span
+                    class="el-upload-list__item-delete"
+                    @click="handleRemove(file)"
+                  >
+                    <i class="el-icon-delete"></i>
+                  </span>
+                </span>
+              </div> -->
+            </el-upload>
+          </el-form-item>
+        </el-row>
+        <el-row>
+          <el-col :span="13">
+            <el-form-item label="套餐名称" prop="name">
+              <el-input v-model="form.name" placeholder="请输入套餐名称" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="13">
+            <el-form-item label="套餐状态" prop="status">
+              <el-select v-model="form.status">
+                <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-form-item label="套餐价格" prop="price">
+            <el-input-number v-model="form.price" size="medium" :min="0" :controls="false" :precision="2"/>
+          </el-form-item>
+        </el-row>
+        <el-row>
+          <el-form-item label="详情" prop="detail">
+            <el-input v-model="form.detail" type="textarea" placeholder="请输入详情" />
+          </el-form-item>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog('form')">取 消</el-button>
+        <el-button type="primary" @click="onSubmit('form')">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { mapGetters } from "vuex";
+import { apiDelete, apiGet, apiPost, apiPostFormData, messagePost } from "@/utils/request.js";
+export default {
+  data() {
+    return {
+      trueValue: 1,
+      falseValue: 0,
+      selectObj: {},
+
+      total: 0, // 模板表格总数
+      currentPage: 1, // 模板表格当前页码
+      pageSize: 10, // 模板表格整页大小
+      queryParams: {
+        // 获取模板参数
+        page: 1,
+        pageSize: 10,
+        name: null,
+      },
+      tables: [], // 模板表格数据
+      formVisit: false, // 是否新增编辑弹窗
+      AddEditRules: {
+        name: [{ required: true, message: "请输入套餐名称", trigger: "blur" }],
+        price: [{ required: true, message: "请输入套餐价格", trigger: "blur" }],
+        detail: [{ required: true, message: "请输入详情", trigger: "blur" }],
+        type: [{ required: true }],
+        status: [{ required: true }],
+      },
+      form: {
+        price: 0,
+        status: 0,
+      },
+
+      title: "新增套餐", // 新增编辑详情弹窗标题
+
+      operation: "/business/meal",
+
+      imgFile: "",
+      fileList: [],
+      limitCount: 1,
+      hideUpload: false,
+      statusOptions: [
+        {
+          value: 0,
+          label: "下架",
+        },
+        {
+          value: 1,
+          label: "上架",
+        },
+      ],
+    };
+  },
+  computed: {
+    ...mapGetters(["canteenId"])
+  },
+  watch: {
+    // 如果 `question` 发生改变，这个函数就会运行
+    canteenId: function (newValue, oldValue) {
+      if(newValue){
+        this.getList()
+      }
+    }
+  },
+  mounted() {
+    this.getList();
+  },
+  methods: {
+    statusFormatter(row, column, cellValue, index) {
+      return this.statusOptions[cellValue].label;
+    },
+    //鼠标进入表格事件
+    cellEnter(row, column, cell, event) {
+      this.selectObj = row;
+    },
+    // 预定状态改变
+    handleBeforeChange() {
+      return new Promise((resolve) => {
+        resolve()
+        messagePost(
+          this,
+          "/business/meal/switchStatus?id=" + this.selectObj.id
+        ).then((res) => {
+          this.getList();
+        });
+      });
+    },
+    // 获取模板表格
+    getList() {
+      this.queryParams.canteenId = this.canteenId
+      apiGet(this, this.operation, this.queryParams).then((res) => {
+        this.tables = res.data;
+        this.total = res.total;
+      });
+    },
+    // 查询详情
+    getDetails(row) {
+      apiGet(this, this.operation + "/details", { id: row.id }).then((res) => {
+        this.form = Object.assign({}, res.data);
+        if (res.data.picAddress) {
+          this.fileList.push({
+            url: res.data.picAddress,
+          });
+        }
+        this.hideUpload = this.fileList.length >= this.limitCount; // this.limitCount就是图片数量
+      });
+    },
+    // page变化getList()触动函数
+    handelSizeChange(val) {
+      this.queryParams.page = val;
+      this.getList();
+    },
+    // pageSize变化getList()触动函数
+    handelCurrentChange(val) {
+      this.queryParams.pageSize = val;
+      this.getList();
+    },
+    // 搜索栏查询
+    queryList: function (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.getList();
+        } else {
+          return false;
+        }
+      });
+    },
+    onSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.title === "新增套餐") {
+            const formData = new FormData();
+            formData.append("file", this.imgFile);
+            formData.append("name", this.form.name);
+            formData.append("price", this.form.price * 100);
+            formData.append("detail", this.form.detail);
+            formData.append("status", this.form.status);
+            formData.append("type", this.form.type);
+            formData.append("canteenId", this.canteenId);
+            apiPostFormData(this, this.operation + "/add", formData).then(
+              (res) => {
+                this.getList();
+                this.closeDialog(formName);
+              }
+            );
+          } else if (this.title === "编辑套餐") {
+            const formData = new FormData();
+            formData.append("file", this.imgFile);
+            formData.append("id", this.form.id);
+            formData.append("name", this.form.name);
+            formData.append("price", this.form.price * 100);
+            formData.append("detail", this.form.detail);
+            formData.append("status", this.form.status);
+            formData.append("type", this.form.type);
+
+            apiPostFormData(this, this.operation + "/edit", formData).then(
+              (res) => {
+                this.getList();
+                this.closeDialog(formName);
+              }
+            );
+          }
+        } else {
+          return false;
+        }
+      });
+    },
+    // 搜索栏重置
+    resetData(formName) {
+      this.$refs[formName].resetFields();
+      this.getList();
+    },
+    // 打开新增编辑弹窗
+    addMealFn(falg) {
+      this.title = "新增套餐";
+      this.hideUpload = this.fileList.length >= this.limitCount; // this.limitCount就是图片数量
+      this.formVisit = true;
+    },
+    // 打开修改弹窗
+    editFn(row) {
+      this.formVisit = true;
+      this.getDetails(row);
+      this.title = "编辑套餐";
+    },
+    // 删除模板
+    deleteFn(row) {
+      const params = {
+        id: row.id,
+      };
+      apiDelete(this, this.operation, params).then((res) => {
+        this.getList();
+      });
+    },
+    // 关闭新增、编辑、变更记录弹窗
+    closeDialog(formName) {
+      this.imgFile = "";
+      this.fileList = [];
+      this.$refs[formName].resetFields();
+      this.$refs.upload.clearFiles();
+      this.formVisit = false;
+    },
+
+    // 文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
+    handleChange(file, fileList) {
+      // const fileName = file.name
+      // const pos = fileName.lastIndexOf('.')
+      // const lastName = fileName.substring(pos, fileName.length)
+      // if (lastName.toLowerCase() !== '.xlsx') {
+      //   this.$message.error('文件必须为.xlsx类型')
+      //   this.$refs.upload.clearFiles()
+      //   return
+      // }
+      // 限制上传文件的大小
+      // const isLt = file.size / 1024 / 1024 / 100 <= 5
+      // if (!isLt) {
+      //   this.$message.error('上传文件不得大于500MB!')
+      //   this.$refs.upload.clearFiles()
+      // }
+      this.hideUpload = fileList.length >= this.limitCount; // this.limitCount就是图片数量
+      this.imgFile = file.raw;
+    },
+    handleRemove(file, fileList) {
+      this.fileList = [];
+      this.imgFile = "";
+      this.hideUpload = fileList.length >= this.limitCount;
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
+          files.length + fileList.length
+        } 个文件`
+      );
+    },
+  },
+};
+</script>
+
+<style>
+.hide .el-upload--picture-card {
+  display: none;
+}
+</style>

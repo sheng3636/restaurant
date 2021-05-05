@@ -1,0 +1,376 @@
+@import "./variables.scss";
+@import "./mixin.scss";
+@import "./transition.scss";
+@import "./element-ui.scss";
+@import "./sidebar.scss";
+
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
+    Microsoft YaHei, Arial, sans-serif;
+}
+
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+  @include scrollBar();
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+// main-container global css
+.app-container {
+  padding: 20px;
+}
+.main-wrapper {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+}
+
+.main-wrapper .main-header {
+  background-color: #f1f2f7;
+  padding: 0px 10px;
+  height: 45px;
+  line-height: 45px;
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  font-size: 15px;
+  .tableHeadRow {
+    display: flex;
+    justify-content: flex-end;
+    height: 45px;
+    align-items: center;
+  }
+  .headerOptionGroip {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 45px;
+  }
+}
+
+.main-wrapper .main-content {
+  border-radius: 5px;
+  overflow-y: auto;
+  min-height: 100px;
+}
+.param {
+  padding-top: 50px !important;
+}
+
+// 左浮动
+.fl {
+  float: left;
+}
+
+// 右边浮动
+.fr {
+  float: right;
+}
+
+// 新版后台模板框架
+.mainWrapper {
+  margin-bottom: 15px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.05);
+
+  .mainHeader {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 45px;
+    // border-bottom: 1px solid #efecec;
+    h3 {
+      padding-left: 10px;
+      font-size: 20px;
+      font-weight: normal;
+
+      &::before {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        content: "";
+        display: block;
+        height: 32px;
+        border-left: 4px solid #218fff;
+      }
+    }
+    .headerOptionGroip {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+  }
+  .mainContent {
+    border-radius: 5px;
+    overflow-y: auto;
+    min-height: 100px;
+  }
+}
+.paginationWrap {
+  text-align: center;
+  .el-pagination {
+    display: block;
+  }
+}
+.cellOptionGroup {
+  display: flex;
+  justify-content: space-between;
+  .el-button + .el-button {
+    margin-left: 0;
+  }
+}
+.f-l {
+  float: left;
+}
+.f-r {
+  float: right;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+.t-c,
+.text-c {
+  text-align: center;
+}
+.t-r.text-r {
+  text-align: right;
+}
+.t-l.text-l {
+  text-align: left;
+}
+.f-w-n {
+  font-weight: normal;
+}
+button,
+input,
+textarea {
+  border: none;
+  outline: none;
+}
+input {
+  user-select: auto;
+}
+.clearfix:after {
+  content: "";
+  display: block;
+  clear: both;
+  visibility: hidden;
+}
+.clearfix {
+  zoom: 1;
+}
+@for $i from 1 through 100 {
+  .w-#{10 * $i} {
+    width: (10px * $i) !important;
+  }
+  .h-#{10 * $i} {
+    height: (10px * $i) !important;
+  }
+  .f-#{1 + $i} {
+    font-size: #{1 + $i}px !important;
+  }
+  .r-#{1 + $i} {
+    border-radius: #{1 + $i}px !important;
+  }
+}
+.f-10 {
+  font-size: 12px;
+  transform: scale(0.8);
+  transform-origin: center;
+}
+
+@for $i from 1 through 20 {
+  .m-#{5 * $i} {
+    margin: (5px * $i);
+  }
+  .m-l-#{5 * $i} {
+    margin-left: (5px * $i);
+  }
+  .m-r-#{5 * $i} {
+    margin-right: (5px * $i);
+  }
+  .m-t-#{5 * $i} {
+    margin-top: (5px * $i);
+  }
+  .m-b-#{5 * $i} {
+    margin-bottom: (5px * $i);
+  }
+  .p-#{5 * $i} {
+    padding: (5px * $i);
+  }
+  .p-l-#{5 * $i} {
+    padding-left: (5px * $i);
+  }
+  .p-r-#{5 * $i} {
+    padding-right: (5px * $i);
+  }
+  .p-t-#{5 * $i} {
+    padding-top: (5px * $i);
+  }
+  .p-b-#{5 * $i} {
+    padding-bottom: (5px * $i);
+  }
+  .t-i-#{5 * $i} {
+    text-indent: (5px * $i);
+  }
+}
+.flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  &.r-reverse {
+    flex-direction: row-reverse;
+  }
+  // 左右布局 反方向
+  &.c-reverse {
+    flex-direction: column-reverse;
+  }
+  // 上下布局 反方向$peop
+  &.column {
+    flex-direction: column;
+  }
+  // 居左
+  &.start {
+    justify-content: flex-start;
+  }
+  // 居右
+  &.end {
+    justify-content: flex-end;
+  }
+  // 居中
+  &.around {
+    justify-content: space-around;
+  }
+  // 居中
+  &.center {
+    justify-content: center;
+  }
+  // 居中 容器之间有空白
+  &.between {
+    justify-content: space-between;
+  }
+  // 居中 容器左右有空白
+  &.evenly {
+    justify-content: space-evenly;
+  }
+  // 允许换行
+  &.wrap {
+    flex-wrap: wrap;
+  }
+  &.alignStart {
+    align-items: start;
+  }
+  // 超出换行
+  > .c-start {
+    align-self: start;
+  }
+  // 父集align-items不生效 改为start
+  > .x-flex-a {
+    flex: auto;
+    width: 10px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  > .x-auto {
+    flex: auto;
+  }
+  > .flex {
+    flex: 1;
+  }
+}
+
+.text-space1 {
+  letter-spacing: 1px;
+}
+.textcut {
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  //word-break: break-all
+}
+.font-weight {
+  font-weight: bold;
+}
+.textcut2 {
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+}
+.textcut3 {
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3;
+  word-break: break-all;
+}
+.textcut4 {
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 4;
+  word-break: break-all;
+}

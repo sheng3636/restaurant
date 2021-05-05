@@ -1,0 +1,436 @@
+<template>
+  <div class="appContainer">
+    <div class="mainWrapper">
+      <div class="main-header">模板查询</div>
+      <div class="main-content">
+        <el-form ref="queryParams" :model="queryParams" label-width="80px" label-position="top">
+          <el-row>
+            <el-col :md="4">
+              <el-form-item label="数据库" prop="library">
+                <el-input v-model="queryParams.library" aria-placeholder="请输入数据库名称" />
+              </el-form-item>
+            </el-col>
+            <el-col :md="4">
+              <el-form-item label="生成目录" prop="pathPrefix">
+                <el-input v-model="queryParams.pathPrefix" aria-placeholder="请输入生成目录" />
+              </el-form-item>
+            </el-col>
+            <el-col :md="4">
+              <el-form-item label="代码包" prop="pathSuffix">
+                <el-input v-model="queryParams.pathSuffix" aria-placeholder="请输入代码包" />
+              </el-form-item>
+            </el-col>
+            <el-col :md="6">
+              <el-form-item class="textLeft param">
+                <el-button type="warning" size="mini" @click="queryList('queryParams')">查询</el-button>
+                <el-button type="danger" size="mini" @click="resetData('queryParams')">重置</el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
+    </div>
+    <div class="mainWrapper">
+      <div class="main-header">
+        <el-row>
+          <el-col :md="6">
+            模板列表
+          </el-col>
+          <el-col :md="18" class="tableHeadRow">
+            <el-button type="primary" size="mini" @click="addTemplateFn()">新增</el-button>
+          </el-col>
+        </el-row>
+      </div>      
+      <div class="main-content">
+        <el-table ref="multipleTable" :data="tables" border fit highlight-current-row>
+          <el-table-column type="index" width="55" label="序号" align="center" />
+          <el-table-column prop="projectName" label="项目名"  align="center" sortable />
+          <el-table-column prop="library" label="数据库"  align="center" sortable />
+          <el-table-column prop="pathPrefix" label="生成目录"  align="center" sortable />
+          <el-table-column prop="pathSuffix" label="代码包"  align="center" sortable />
+          <el-table-column label="操作" width="180" align="center">
+            <template slot-scope="scope">
+              <el-dropdown>
+                <el-button type="success" size="medium">
+                  操作<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown" v-if="scope.row.accountState!=3">
+                  <el-dropdown-item @click.native="editFn(scope.row)">修改</el-dropdown-item>
+                  <el-dropdown-item @click.native="deleteFn(scope.row)">删除</el-dropdown-item>
+                  <el-dropdown-item @click.native="generateFn(scope.row)">生成代码</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!--分页-->
+        <el-pagination :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handelSizeChange"
+          @current-change="handelCurrentChange" />
+      </div>
+    </div>
+    <el-dialog :title="title" :visible.sync="addEditVisit" :close-on-click-modal="false"
+      :close-on-press-escape="false" :before-close="dialogClose" width="50%">
+      <el-form ref="addEditForm" class="dialogBody" :rules="AddEditRules" :model="form" label-width="80px" label-position="top">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="项目名" prop="projectName">
+              <el-input v-model="form.projectName" placeholder="请输入数据库名称" />
+            </el-form-item>
+          </el-col>          
+          <el-col :span="12">
+            <el-form-item label="数据库" prop="library">
+              <el-input v-model="form.library" placeholder="请输入数据库名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="访问地址前缀" prop="urlPrefix">
+              <el-input v-model="form.urlPrefix" placeholder="请输入访问地址前缀" />
+            </el-form-item>
+          </el-col>          
+          <el-col :span="12">
+            <el-form-item label="生成目录" prop="pathPrefix">
+              <el-input v-model="form.pathPrefix" placeholder="请输入生成目录" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="代码包" prop="pathSuffix">
+              <el-input v-model="form.pathSuffix" placeholder="请输入代码包" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="前端目录" prop="frontEndPath">
+              <el-input v-model="form.frontEndPath"  placeholder="请输入前端目录" />
+            </el-form-item>
+          </el-col>             
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogClose">取 消</el-button>
+        <el-button type="primary" @click="onSubmit('addEditForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+
+
+
+
+    <el-dialog :title="title" :visible.sync="popup" :close-on-click-modal="false"
+      :close-on-press-escape="false" :before-close="dialogClose" width="50%">
+      <el-form ref="popupForm" class="dialogBody" :rules="AddEditRules" :model="form" label-width="80px" label-position="top">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="项目名" prop="projectName">
+              <el-input v-model="form.projectName" :disabled="true" placeholder="请输入数据库名称" />
+            </el-form-item>
+          </el-col>               
+          <el-col :span="12">
+            <el-form-item label="数据库" prop="library">
+              <el-input v-model="form.library" :disabled="true" placeholder="请输入数据库名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="访问地址前缀" prop="urlPrefix">
+              <el-input v-model="form.urlPrefix" :disabled="true" placeholder="请输入访问地址前缀" />
+            </el-form-item>
+          </el-col>               
+          <el-col :span="12">
+            <el-form-item label="生成目录" prop="pathPrefix">
+              <el-input v-model="form.pathPrefix" :disabled="true" placeholder="请输入生成目录" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="代码包" prop="pathSuffix">
+              <el-input v-model="form.pathSuffix" :disabled="true" placeholder="请输入代码包" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="前端目录" prop="frontEndPath">
+              <el-input v-model="form.frontEndPath" :disabled="true" placeholder="请输入前端目录" />
+            </el-form-item>
+          </el-col>      
+          <el-col :span="12">
+            <el-form-item label="模块名" prop="moduleName">
+              <el-input v-model="form.moduleName" :disabled="true" placeholder="请输入模块名" />
+            </el-form-item>
+          </el-col>               
+        </el-row>
+
+
+        <el-collapse v-model="activeNames" @change="handleChange">
+          <el-collapse-item title="生成java代码" name="1">
+            <el-transfer
+              filterable
+              :filter-method="filterMethod"
+              filter-placeholder="请输入表名"
+              v-model="form.value"
+              :render-content="renderFunc"
+              :props="{
+                key: 'tableName',
+                label: 'tableComment'
+              }"
+              :data="data"  @change="handleChange">
+            </el-transfer>
+          </el-collapse-item>
+          <el-collapse-item title="生成vue代码:筛选项" name="2">
+            <el-transfer
+              filterable
+              :filter-method="filterMethod1"
+              filter-placeholder="请输入列名"
+              v-model="form.filters"
+              :render-content="renderFunc1"
+              :titles="filtersTitle"
+              :props="{
+                key: 'columnName',
+                label: 'columnComment'
+              }"
+              :data="filters"/>
+          </el-collapse-item>
+          <el-collapse-item title="生成vue代码:显示列" name="3">
+            <el-transfer
+              filterable
+              :filter-method="filterMethod1"
+              filter-placeholder="请输入列名"
+              v-model="form.columns"
+              :titles="columnsTitle"
+              :render-content="renderFunc1"
+              :props="{
+                key: 'columnName',
+                label: 'columnComment'
+              }"
+              :data="columns"/>
+          </el-collapse-item>          
+          <el-collapse-item title="生成vue代码:编辑列" name="4">
+            <el-transfer
+              filterable
+              :filter-method="filterMethod1"
+              filter-placeholder="请输入列名"
+              :titles="editColumnsTitle"
+              v-model="form.editColumns"
+              :render-content="renderFunc1"
+              :props="{
+                key: 'columnName',
+                label: 'columnComment'
+              }"
+              :data="editColumns"/>
+          </el-collapse-item>            
+        </el-collapse>        
+
+        
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogClose">取 消</el-button>
+        <el-button type="primary" @click="onSubmit('popupForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { apiGet, apiPost, apiPut, apiDelete } from '@/utils/request.js'
+export default {
+  data() {
+   
+    return {
+      total: 0, // 模板表格总数
+      currentPage: 1, // 模板表格当前页码
+      pageSize: 10, // 模板表格整页大小
+      queryParams: {
+        // 获取模板参数
+        page: 1,
+        pageSize: 10,
+        pathPrefix: '',
+        pathSuffix: '',
+        library: ''
+      },
+      tables: [
+     
+      ], // 模板表格数据
+      addEditVisit: false, // 是否新增编辑弹窗
+      popup:false, // 生成代码弹窗
+      AddEditRules:{
+        library: [
+          { required: true, message: '请输入数据库名称', trigger: 'blur' }
+        ],
+        pathPrefix: [
+          { required: true, message: '请输入生成目录', trigger: 'blur' }
+        ],
+        pathSuffix: [
+          { required: true, message: '请输入包名称', trigger: 'blur' }
+        ]
+      },
+      form: {
+      },
+      data: [],
+      filters: [],
+      columns: [],
+      editColumns: [],
+      filtersTitle:[],
+      columnsTitle:[],
+      editColumnsTitle:[],
+      activeNames: ['1'],
+      filterMethod(query, item) {
+        return item.tableName.indexOf(query) > -1 || item.tableComment.indexOf(query) > -1;
+      },
+      filterMethod1(query, item) {
+        return item.columnName.indexOf(query) > -1 || item.columnComment.indexOf(query) > -1;
+      },      
+      renderFunc(h, option) {
+        return <span>{ option.tableName } - { option.tableComment }</span>;
+      },
+      renderFunc1(h, option) {
+        return <span>{ option.columnName } - { option.columnComment }</span>;
+      },
+      title: '新增模板' ,// 新增编辑详情弹窗标题、生成代码标题
+     
+      operation: '/system/library', 
+      generateCode: '/system/generateCode'
+    }
+  },
+  mounted() {
+    this.getTemplateListFn()
+  },
+  methods: {
+    // 获取模板表格
+    getTemplateListFn() {
+      apiGet(this, this.operation, this.queryParams).then(res => {
+        this.tables = res.data
+      })
+    },   
+    // 查询生成代码信息详情
+    getDetails(row){
+      apiGet(this, this.operation+"/details", {id:row.id}).then(
+        res => { 
+          this.form=Object.assign({},res.data)
+        }
+      )
+    },
+    //获取列
+    getColumns() { 
+      let params={}
+      if(this.form.value){
+        params={tableSchema:this.form.library,table:this.form.value[0]}
+        this.filtersTitle=[this.form.value[0],'筛选项']
+        this.columnsTitle=[this.form.value[0],'显示表格']
+        this.editColumnsTitle=[this.form.value[0],'编辑列']
+        apiGet(this, this.generateCode+'/columns', params).then(res => {
+          this.filters = res.data
+          this.columns = res.data
+          this.editColumns = res.data
+        })
+      }
+    
+ 
+    },        
+    // page变化getTemplateListFn()触动函数
+    handelSizeChange(val) {
+      this.queryParams.page = val
+      this.getTemplateListFn()
+    },
+    // pageSize变化getTemplateListFn()触动函数
+    handelCurrentChange(val) {
+      this.queryParams.pageSize = val
+      this.getTemplateListFn()
+    },
+    // 搜索栏查询
+    queryList: function(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.getTemplateListFn()
+        } else {
+          return false
+        }
+      })
+    },
+    onSubmit(formName){
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          if(this.title === '新增模板') {
+            apiPost(this,this.operation,this.form).then(res => {
+              this.getTemplateListFn()
+              this.dialogClose()
+            })
+          } else if(this.title === '编辑模板'){
+         
+            apiPut(this, this.operation, this.form).then(res => {
+              this.dialogClose()
+              this.getTemplateListFn()
+            })
+          }else {
+            console.log(this.form)
+            let params={
+              tableNames:this.form.value,
+              autoGeneratedFile:this.form.pathPrefix,
+              tableSchema:this.form.library,
+              packageName:this.form.pathSuffix,
+              projectName:this.form.projectName,
+              urlPrefix: this.form.urlPrefix,
+              moduleName: this.form.moduleName,
+              frontEndPath:this.form.frontEndPath,
+              filters: this.form.filters,
+              columns: this.form.columns,
+              editColumns: this.form.editColumns
+            }
+            apiPost(this,this.generateCode,params).then(res => {
+ 
+              this.getTemplateListFn()
+              this.dialogClose()
+            })
+          }
+        } else {
+          return false
+        }
+      })
+    },
+    // 搜索栏重置
+    resetData(formName) {
+      this.$refs[formName].resetFields()
+      this.getTemplateListFn()
+    },
+    // 打开新增编辑弹窗
+    addTemplateFn(falg) {
+      this.title = '新增模板'
+      this.form={}
+      this.addEditVisit = true
+    },
+    // 打开修改弹窗
+    editFn(row){
+      this.addEditVisit = true
+      this.getDetails(row)
+      this.title = '编辑模板'
+    },
+    // 删除模板
+    deleteFn(row){
+      let params={
+          id:row.id
+      };
+      apiDelete(this,this.operation,params).then(res => {
+
+          this.getTemplateListFn()
+      });
+    },
+    //生成代码
+    generateFn(row){
+      this.form=row
+      this.popup = true
+      this.title = '生成代码'
+
+      apiGet(this,this.generateCode,{tableSchema:row.library}).then(res => {
+          
+          this.data=res.data
+         //this.$set(this.data,res.data)
+      });   
+    },
+    // 关闭新增、编辑、变更记录弹窗
+    dialogClose() {
+      this.addEditVisit = false
+      this.changeRecordVisit = false
+      this.visitedRecordVisit = false
+      this.popup =false
+    },
+    handleChange(value, direction, movedKeys) {
+        console.log(this.form);
+        this.getColumns() 
+    }
+  }
+}
+</script>
