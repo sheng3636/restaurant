@@ -6,54 +6,96 @@ import {
 import NProgress from 'nprogress' // 进度条
 import 'nprogress/nprogress.css' // 进度条样式
 import {
-  getToken, getSession
+  getToken,
+  getSession
 } from '@/utils/auth' // 从cookie获取token
 import getPageTitle from '@/utils/get-page-title'
 // const _import = require('./router/_import_' + process.env.NODE_ENV)//获取组件的方法
 // import Layout from '@/layout'
 
 
-function checkExist(list, path, obj){
-  if(list && list.length){
+function checkExist(list, path, obj) {
+  if (list && list.length) {
     list.forEach(item => {
-      if(item.path === path){
+      if (item.path === path) {
         obj.flag = true
-      }else{
-        checkExist(item.children,path,obj)
+      } else {
+        checkExist(item.children, path, obj)
       }
     })
-  
+
   }
 }
 
 
 NProgress.configure({
-  showSpinner: false
-}) // NProgress配置
+    showSpinner: false
+  }) // NProgress配置
 
-const whiteList = ['/login','/404'] // 不需要重定向白名单
+const whiteList = ['/login', '/404'] // 不需要重定向白名单
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async(to, from, next) => {
+  // if (to.path === '/config/meal') {
+  //   next({
+  //     path: '/404'
+  //   })
+  // }
 
-  function filterAsyncRouter(asyncRouterMap){
-   
-    const accessedRouters = asyncRouterMap.filter(route => {
- 
-      if (route.component === 'Layout') {//Layout组件特殊处理
-        route.component = Layout
-      } 
-      else {
-        
-        route.component = (resolve) => require(["@/views" + route.path + ".vue"], resolve)
+  // function filterAsyncRouter(asyncRouterMap) {
+
+  //   const accessedRouters = asyncRouterMap.filter(route => {
+
+  //     if (route.component === 'Layout') { //Layout组件特殊处理
+  //       route.component = Layout
+  //     } else {
+
+  //       route.component = (resolve) => require(["@/views" + route.path + ".vue"], resolve)
+  //     }
+  //     if (route.children && route.children.length > 0) {
+  //       route.children = filterAsyncRouter(route.children)
+  //     }
+  //     return true
+  //   })
+
+  //   return accessedRouters
+  // }
+  function filterAsyncRouter(asyncRouterMap) {
+    //   asyncRouterMap.forEach(route => {
+    // for (let i = 0; i < route.children.length; i++) {
+    // const element = array[i];
+    // accessedRouters.push(route)
+    // console.log(element);
+    // }
+    // })
+    // return accessedRouters
+    for (let i = 0; i < asyncRouterMap.length; i++) {
+      const pre = asyncRouterMap[i];
+      if (pre.children.length === 1) {
+        // pre.component = (resolve) => require(["@/views" + pre.children[0].component + ".vue"], resolve)
+        pre.component = () =>
+          import ("@/views" + pre.children[0].component + ".vue")
+        pre.path = '/' + pre.path
+      } else {
+        for (let j = 0; j < pre.children.length; j++) {
+          const old = pre.children[j];
+          // old.component = (resolve) => require(["@/views" + old.component + ".vue"], resolve)
+          old.component = () =>
+            import ("@/views" + old.component + ".vue")
+        }
       }
-      if (route.children && route.children.length>0) {
-        route.children = filterAsyncRouter(route.children)
-      }
-      return true
-    })
-  
-    return accessedRouters
+    }
+    let obj = [{
+      path: '/',
+      component: () =>
+        import ('@/components/whole.vue'),
+      meta: {
+        title: '整体页面布局'
+      },
+      children: asyncRouterMap
+    }]
+    return obj
   }
+  // console.log(store.getters.menus);
 
 
   NProgress.start() // 进度条
@@ -66,9 +108,9 @@ router.beforeEach(async (to, from, next) => {
         path: '/'
       })
       NProgress.done()
-    } else { 
+    } else {
       const hasGetUserInfo = store.getters.name
-      
+
       if (hasGetUserInfo) {
         next()
       } else {
@@ -78,12 +120,13 @@ router.beforeEach(async (to, from, next) => {
           try {
             // 获取用户信息
             await store.dispatch('user/getInfo')
-            
-            // let routerData=filterAsyncRouter(store.getters.menus)
-             
+
+            // console.log(filterAsyncRouter(store.getters.menus));
+            // let routerData = filterAsyncRouter(store.getters.menus)
+
             // router.options.routes = routerData
             // router.addRoutes(routerData); // 动态添加可访问路由表
-
+            console.log(router);
             // 因有退出重新登录时，记录回传地址功能
             // 若用户退出后，切换登录账户，检测回传地址是否在用户权限之内
             // let obj = {flag: false}
@@ -97,7 +140,7 @@ router.beforeEach(async (to, from, next) => {
             //   })
             // }
 
-            
+
             next()
           } catch (error) {
             // 删除token，进入登录页面重新登录
@@ -107,10 +150,10 @@ router.beforeEach(async (to, from, next) => {
             NProgress.done()
           }
         }
-        
+
       }
     }
-  } else { 
+  } else {
     // 没有token
     if (whiteList.indexOf(to.path) !== -1) {
       next() // 白名单中有的路由，可以继续访问

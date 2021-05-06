@@ -36,57 +36,63 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
-      items: [
-        // 水平一级菜单栏的菜单
-        { index: 'Home', title: '数据总览', icon: 'dataOverview' },
-        { index: 'normalOrder', title: '点餐详情', icon: 'detail' },
-        { index: 'config', title: '用餐设置', icon: 'mealSeeting' },
-        { index: 'account', title: '账号管理', icon: 'user1' },
-        { index: 'systemConfig', title: '系统设置', icon: 'system' },
-      ],
-    }
+      // items: [
+      //   // 水平一级菜单栏的菜单
+      //   { index: 'Home', title: '数据总览', icon: 'dataOverview' },
+      //   { index: 'normalOrder', title: '点餐详情', icon: 'detail' },
+      //   { index: 'config', title: '用餐设置', icon: 'mealSeeting' },
+      //   { index: 'account', title: '账号管理', icon: 'user1' },
+      //   { index: 'systemConfig', title: '系统设置', icon: 'system' },
+      // ],
+    };
   },
   computed: {
-    ...mapGetters(['name', 'menus']),
+    ...mapGetters(["name", "menus"]),
     menuItems() {
-      let arr = []
+      // let aaa = JSON.parse(JSON.stringify(this.menus))
+      // aaa.shift()
+      // aaa.shift()
+      // aaa.shift()
+      // console.log(aaa);
+      let arr = [];
       for (let i = 0; i < this.menus.length; i++) {
         const element = this.menus[i];
+        console.log(element.path.split("/"));
         arr.push({
-          index:element.path,
-          title:element.meta.title,
-          icon:element.meta.icon
-        })
+          index: element.path,
+          title: element.meta.title,
+          icon: element.meta.icon,
+        });
       }
-      return arr
+      return arr;
     },
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     // 根据路径绑定到对应的一级菜单，防止页面刷新重新跳回第一个
     toIndex() {
-      return this.$route.path.split('/')[1]
+      console.log(this.$route.path.split("/")[1]);
+      return this.$route.path.split("/")[1];
     },
     // 切换菜单栏
     handleSelect(index) {
-      this.$router.push('/' + index)
+      this.$router.push("/" + index);
     },
     // 用户名下拉菜单选择事件
     handleCommand(command) {
-      if (command == 'loginout') {
-        this.$router.push('/login')
+      if (command == "loginout") {
+        this.$router.push("/login");
       }
     },
     async logout() {
-      clearInterval(this.intervalId)
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      clearInterval(this.intervalId);
+      await this.$store.dispatch("user/logout");
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     },
   },
-}
+};
 </script>

@@ -29,12 +29,14 @@ Vue.use(Router)
  */
 export const constantRoutes = [{
     path: '/login',
-    component: () => import('@/views/login/index'),
+    component: () =>
+      import ('@/views/login/index'),
     hidden: true
   },
   {
     path: '/404',
-    component: () => import('@/views/404'),
+    component: () =>
+      import ('@/views/404'),
     hidden: true
   },
   {
@@ -43,56 +45,55 @@ export const constantRoutes = [{
   },
   {
     path: '/',
-    component: () => import('@/components/whole.vue'),
+    component: () =>
+      import ('@/components/whole.vue'),
     meta: {
       title: '整体页面布局'
     },
     children: [{
         path: '/home',
-        component: () => import('@/views/index/index.vue'),
+        component: () =>
+          import ('@/views/index/index.vue'),
         meta: {
           title: '首页'
-        },
-        redirect: '/Home', // 该配置是若点击选择父目录时，默认选中该父目录下的子路径页面
-        children: [{
-          path: '/Home',
-          component: () => import('@/views/index/index.vue'),
-          meta: {
-            title: '首页'
-          },
-        }]
+        }
       },
       {
         path: '/normalOrder',
-        component: () => import('@/views/business/normalOrder.vue'),
+        component: () =>
+          import ('@/views/business/normalOrder.vue'),
         meta: {
           title: '点餐详情'
         }
       },
       {
         path: '/config',
-        component: () => import('@/views/config/index.vue'),
+        component: () =>
+          import ('@/views/config/index.vue'),
         meta: {
           title: '用餐设置'
         },
         redirect: '/config/orderConfig', // 该配置是若点击选择一级菜单时，默认选中并跳转到该一级菜单下的第一个二级菜单
         children: [{
             path: 'orderConfig',
-            component: () => import('@/views/config/orderConfig.vue'),
+            component: () =>
+              import ('@/views/config/orderConfig.vue'),
             meta: {
               title: '订餐设置'
             },
           },
           {
             path: 'meal',
-            component: () => import('@/views/config/meal.vue'),
+            component: () =>
+              import ('@/views/config/meal.vue'),
             meta: {
               title: '套餐设置'
             },
           },
           {
             path: 'site',
-            component: () => import('@/views/manager/site.vue'),
+            component: () =>
+              import ('@/views/manager/site.vue'),
             meta: {
               title: '网点设置'
             },
@@ -101,28 +102,32 @@ export const constantRoutes = [{
       },
       {
         path: '/account',
-        component: () => import('@/views/account/index.vue'),
+        component: () =>
+          import ('@/views/account/index.vue'),
         meta: {
           title: '账号管理'
         },
         redirect: '/account/user', // 该配置是若点击选择父目录时，默认选中该父目录下的子路径页面
         children: [{
             path: 'user',
-            component: () => import('@/views/account/user.vue'),
+            component: () =>
+              import ('@/views/account/user.vue'),
             meta: {
               title: '用户管理'
             },
           },
           {
             path: 'role',
-            component: () => import('@/views/account/role.vue'),
+            component: () =>
+              import ('@/views/account/role.vue'),
             meta: {
               title: '角色管理'
             },
           },
           {
             path: 'department',
-            component: () => import('@/views/account/department.vue'),
+            component: () =>
+              import ('@/views/account/department.vue'),
             meta: {
               title: '部门管理'
             },
@@ -131,21 +136,24 @@ export const constantRoutes = [{
       },
       {
         path: '/systemConfig',
-        component: () => import('@/views/systemConfig/index.vue'),
+        component: () =>
+          import ('@/views/systemConfig/index.vue'),
         meta: {
           title: '系统设置'
         },
         redirect: '/systemConfig/canteen', // 该配置是若点击选择父目录时，默认选中该父目录下的子路径页面
         children: [{
             path: 'canteen',
-            component: () => import('@/views/systemConfig/canteen.vue'),
+            component: () =>
+              import ('@/views/systemConfig/canteen.vue'),
             meta: {
               title: '食堂设置'
             },
           },
           {
             path: 'checkMachine',
-            component: () => import('@/views/systemConfig/checkMachine.vue'),
+            component: () =>
+              import ('@/views/systemConfig/checkMachine.vue'),
             meta: {
               title: '核销机管理'
             },
@@ -154,70 +162,80 @@ export const constantRoutes = [{
       },
       {
         path: '/system',
-        component: () => import('@/views/system/index.vue'),
+        component: () =>
+          import ('@/views/system/index.vue'),
         meta: {
           title: '管理设置'
         },
         redirect: '/system/parameterInfoBusiness', // 该配置是若点击选择父目录时，默认选中该父目录下的子路径页面
         children: [{
             path: 'parameterInfoBusiness',
-            component: () => import('@/views/system/parameterInfoBusiness.vue'),
+            component: () =>
+              import ('@/views/system/parameterInfoBusiness.vue'),
             meta: {
               title: '业务参数设置'
             },
           },
           {
             path: 'configItemMenu',
-            component: () => import('@/views/system/configItemMenu.vue'),
+            component: () =>
+              import ('@/views/system/configItemMenu.vue'),
             meta: {
               title: '定制化菜单'
             },
           },
           {
             path: 'dept',
-            component: () => import('@/views/system/dept.vue'),
+            component: () =>
+              import ('@/views/system/dept.vue'),
             meta: {
               title: '人员组织'
             },
           },
           {
             path: 'role',
-            component: () => import('@/views/system/role.vue'),
+            component: () =>
+              import ('@/views/system/role.vue'),
             meta: {
               title: '角色授权'
             },
           },
           {
             path: 'logging',
-            component: () => import('@/views/system/logging.vue'),
+            component: () =>
+              import ('@/views/system/logging.vue'),
             meta: {
               title: '日志查询'
             },
           },
           {
             path: 'functionAuthority',
-            component: () => import('@/views/system/functionAuthority.vue'),
+            component: () =>
+              import ('@/views/system/functionAuthority.vue'),
             meta: {
               title: '定制化菜单权限菜单'
             },
           },
           {
             path: 'parameterInfo',
-            component: () => import('@/views/system/parameterInfo.vue'),
+            component: () =>
+              import ('@/views/system/parameterInfo.vue'),
             meta: {
               title: '参数设置'
             },
           },
           {
             path: 'schedule',
-            component: () => import('@/views/system/schedule.vue'),
+            component: () =>
+              import ('@/views/system/schedule.vue'),
             meta: {
               title: '定时任务'
             },
           },
           {
             path: 'template',
-            component: () => import('@/views/system/template.vue'),
+            component: () =>
+              import ('@/views/system/template.vue'),
             meta: {
               title: '生成代码'
             },

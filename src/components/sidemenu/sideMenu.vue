@@ -23,6 +23,7 @@ export default {
   methods: {
     // 根据路径绑定到对应的二级菜单，防止页面刷新重新跳回第一个
     toIndex() {
+      console.log(this.$route.path.split('/')[2]);
       return this.$route.path.split('/')[2]
     },
   },

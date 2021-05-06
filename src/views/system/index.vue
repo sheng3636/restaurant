@@ -41,6 +41,9 @@ export default {
   computed: {
     ...mapGetters(['menus']),
     subMenuItems() {
+      // let aaa = JSON.parse(JSON.stringify(this.menus))
+      // aaa.shift()
+      // aaa.shift()
       let menus = []
       let arr = this.menus.filter(item => item.path == 'system')[0].children
       for (let i = 0; i < arr.length; i++) {
