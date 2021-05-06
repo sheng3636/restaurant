@@ -1,0 +1,63 @@
+<template>
+  <div class="appWrapper">
+    <!-- 一级菜单下面所拥有的二级菜单 -->
+    <el-aside class="sidebar" width="170">
+      <SideMenu :items='subMenuItems'></SideMenu>
+    </el-aside>
+    <!-- 以及二级菜单所对应的页面 -->
+    <el-main class="mainBottom">
+      <router-view></router-view>
+    </el-main>
+  </div>
+</template>
+<script>
+import { mapGetters } from 'vuex'
+import SideMenu from '@/components/sidemenu/sideMenu'
+export default {
+  components: {
+    SideMenu,
+  },
+  data() {
+    return {
+      // items: [
+      //   {
+      //     index: 'user',
+      //     title: '用户管理',
+      //     icon: 'r8',
+      //   },
+      //   {
+      //     index: 'role',
+      //     title: '角色管理',
+      //     icon: 'r9',
+      //   },
+      //   {
+      //     index: 'department',
+      //     title: '部门管理',
+      //     icon: 'r10',
+      //   },
+      // ],
+    }
+  },
+  computed: {
+    ...mapGetters(['menus']),
+    subMenuItems() {
+      let menus = []
+      let arr = this.menus.filter(item => item.path == 'account')[0].children
+      for (let i = 0; i < arr.length; i++) {
+        const element = arr[i];
+        menus.push({
+          index:element.path,
+          title:element.meta.title,
+          icon:element.meta.icon
+        })
+      }
+      return menus
+    },
+  },
+  mounted () {
+    
+  }
+}
+</script>
+<style scoped>
+</style>

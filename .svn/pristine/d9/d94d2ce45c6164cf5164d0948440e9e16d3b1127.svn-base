@@ -1,0 +1,606 @@
+@import "./variables.scss";
+@import "./mixin.scss";
+@import "./transition.scss";
+@import "./element-ui.scss";
+@import "./sidebar.scss";
+
+body {
+  height: 100%;
+  background: #F0F2F5;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
+    Microsoft YaHei, Arial, sans-serif;
+}
+
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+  @include scrollBar();
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+// main-container global css
+aside {
+  background: #eef1f6;
+  padding: 8px 24px;
+  margin-bottom: 20px;
+  border-radius: 2px;
+  display: block;
+  line-height: 32px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  color: #2c3e50;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  a {
+    color: #337ab7;
+    cursor: pointer;
+
+    &:hover {
+      color: rgb(32, 160, 255);
+    }
+  }
+}
+
+// ::-webkit-scrollbar-track-piece {
+//   background: #d3dce6;
+// }
+
+// ::-webkit-scrollbar {
+//   width: 6px;
+// }
+
+// ::-webkit-scrollbar-thumb {
+//   background: #99a9bf;
+//   border-radius: 20px;
+// }
+
+
+// 页面布局全局样式
+.bodyWrapper {
+  @include wh(100%,100%);
+  width: 100%;
+  height: 100%;
+  background: #F0F2F5;
+}
+.systemHeader {
+  @include fj(space-between);
+  align-items: center;
+  padding: 0 30px;
+  margin-bottom: 20px;
+  @include wh(100%,88px);
+  background: #fff;
+  .logo {
+    width: 300px;
+    @include sc(24px,#333);
+  } 
+  .el-menu.el-menu--horizontal {
+    width: calc(100% - 300px - 205px);
+    height: 100%;
+  }
+  .el-menu--horizontal > .el-menu-item.is-active {
+    border-bottom: 2px solid #0070FF;
+    color: #0070FF;
+    font-weight: 700;
+  }
+  .el-menu--horizontal > .el-menu-item {
+    margin: 0 15px;
+    height: 100%;
+    line-height: 88px;
+    font-size: 16px;
+    color: #515151;
+  }
+  .headerUserIcon {
+    display: flex;
+    @include wh(205px,70px);
+    align-items: center;
+    .userAvator {
+      margin-left: 20px;
+      img {
+        display: block;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+      }
+    }
+    .userName {
+      margin-left: 10px;
+    }
+    .el-dropdown-link {
+      cursor: pointer;
+    }
+    .el-dropdown-menu__item {
+      text-align: center;
+    }
+  }
+}
+
+
+.appWrapper {
+  @include clearfix;
+  position: relative;
+  @include wh(100%,calc(100% - 88px - 20px));
+  /* 左侧菜单栏定位和位置大小设定 */
+  .sidebar {
+    display: block;
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 115px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar-track-piece {
+      background: #d3dce6;
+    }
+
+    &::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #99a9bf;
+      border-radius: 20px;
+    }
+  }
+  .el-menu {
+    border: none;
+  }
+  .sidebar-el-menu {
+    padding-top: 25px;
+    width: 115px;
+    .subMenuImg {
+      display: block;
+      @include wh(37px,37px);
+    }
+  }
+  .sidebar > ul {
+  //  @include wh(100%,100%);
+    min-height: 100%;
+  }
+  /* 左侧二级菜单项的样式 */
+  .el-menu-item {
+    @include fj(center);
+    align-items: center;
+    flex-direction: column;
+    padding-left: 0!important;
+    padding: 0;
+    margin: 0 auto 25px auto;
+      @include wh(90px,90px);
+    line-height: 35px;
+    font-size: 16px !important;
+    color: #141414 !important;
+    text-align:center;
+    box-sizing: border-box;
+    img {
+      @include wh(34px,34px)
+    }
+    &:hover {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      color: #00796A !important;
+      background: #F0F2F5 !important;
+    }
+  }
+  /* 左侧二级菜单选中时的样式 */
+  .el-menu-item.is-active {
+    border-radius: 10px;
+    color: #00796A !important;
+    background: #F0F2F5 !important;
+  }
+  .mainBottom {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 145px;
+    padding: 0;
+    @include wh(calc(100% - 154px),100%);
+  }
+}
+.appContainer {
+  padding: 0 20px 0 20px;
+  width: 100%;
+}
+.mainWrapper {
+  margin-bottom: 15px;
+  background: #fff;
+  .mainHeader {
+    @include fj(flex-start);
+    align-items: center;
+    .title {
+      margin-right: 20px;
+      padding: 25px 10px;
+      display: inline-block;
+      @include sc(24px,#373d41);
+      vertical-align: middle;
+      .dataCountDetail {
+        padding-left: 15px;
+        display: inline-block;
+        @include sc(16px,#666);
+      }
+    }
+    .headerCenterWrap {
+      @include fj(space-between);
+      align-items: center;
+      width: 340px;
+      @include sc(20px,#303030);
+      cursor: pointer;
+      white-space: nowrap;
+      .typeButton {
+        padding-bottom: 5px;
+        &.active{
+          color: #2775FF;
+          border-bottom: 3px solid #2775FF;
+        }
+      }
+    }
+    .searchBar {
+      @include fj(flex-end);
+      padding-right: 25px;
+      .el-form-item {
+        margin-right: 20px;
+        margin-bottom: 0;
+      }
+      .btnGroup {
+        display: flex;
+        align-items: center;
+      }
+      .button {
+        display: inline-block;
+        margin-left: 10px;
+        padding:  0px 25px;
+        line-height: 40px;
+        @include sc(16px,#fff);
+        // text-align: center;
+        cursor: pointer;
+        &.button1 {
+          background-color: #07AD0F;
+        }
+        // &.button1 {
+        //   background-color: #2562dc;
+        // }
+        // &.button2 {
+        //   background-color: #129c00;
+        // }
+        // &.button3 {
+        //   background-color: #ff8315;
+        // }
+        // &.button4 {
+        //   background-color: #909399;
+        // }
+      }
+      .linkBtn {
+        @include sc(16px,#909090);
+        cursor: pointer;
+      }
+    }
+    &.mainHeader1 {
+      justify-content: space-between;
+    }
+  }
+  .mainContent {
+    overflow-y: auto;
+    min-height: 100px;
+  }
+}
+.optWrap {
+  @include wh(100%,100%);
+  @include fj(space-around);
+  .optBtn {
+    padding-left: 20px;
+    padding-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    &.optBtn1 {
+      background: url(../assets/images/r1.png) no-repeat left center;
+      background-size: 16px 16px;
+      color: #0B78FF;
+    }
+    &.optBtn2 {
+      background: url(../assets/images/r2.png) no-repeat left center;
+      background-size: 16px 16px;
+      color: #00A957;
+    }
+    &.optBtn3 {
+      background: url(../assets/images/r3.png) no-repeat left center;
+      background-size: 16px 16px;
+      color: #FF3434;
+    }
+  }
+}
+.paginationWrap {
+  text-align: right;
+  .el-pagination {
+    display: block;
+  }
+}
+
+.optionBtn {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 0 10px;
+  line-height: 30px;
+  @include sc(16px,#fff);
+  @include borderRadius(5px);
+  cursor: pointer;
+  &:last-child {
+    margin-right: 0;
+  }
+  &.optionBtn1 {
+    background-color: #ff8315;
+  }
+  &.optionBtn2 {
+    background-color: #ff6060;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+.cellOptionGroup {
+  display: flex;
+  justify-content: space-between;
+  .el-button + .el-button {
+    margin-left: 0;
+  }
+}
+.f-l {
+  float: left;
+}
+.f-r {
+  float: right;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+.t-c,
+.text-c {
+  text-align: center;
+}
+.t-r.text-r {
+  text-align: right;
+}
+.t-l.text-l {
+  text-align: left;
+}
+.f-w-n {
+  font-weight: normal;
+}
+button,
+input,
+textarea {
+  border: none;
+  outline: none;
+}
+input {
+  user-select: auto;
+}
+.clearfix:after {
+  content: "";
+  display: block;
+  clear: both;
+  visibility: hidden;
+}
+.clearfix {
+  zoom: 1;
+}
+@for $i from 1 through 100 {
+  .w-#{10 * $i} {
+    width: (10px * $i) !important;
+  }
+  .h-#{10 * $i} {
+    height: (10px * $i) !important;
+  }
+  .f-#{1 + $i} {
+    font-size: #{1 + $i}px !important;
+  }
+  .r-#{1 + $i} {
+    border-radius: #{1 + $i}px !important;
+  }
+}
+.f-10 {
+  font-size: 12px;
+  transform: scale(0.8);
+  transform-origin: center;
+}
+
+@for $i from 1 through 20 {
+  .m-#{5 * $i} {
+    margin: (5px * $i);
+  }
+  .m-l-#{5 * $i} {
+    margin-left: (5px * $i);
+  }
+  .m-r-#{5 * $i} {
+    margin-right: (5px * $i);
+  }
+  .m-t-#{5 * $i} {
+    margin-top: (5px * $i);
+  }
+  .m-b-#{5 * $i} {
+    margin-bottom: (5px * $i);
+  }
+  .p-#{5 * $i} {
+    padding: (5px * $i);
+  }
+  .p-l-#{5 * $i} {
+    padding-left: (5px * $i);
+  }
+  .p-r-#{5 * $i} {
+    padding-right: (5px * $i);
+  }
+  .p-t-#{5 * $i} {
+    padding-top: (5px * $i);
+  }
+  .p-b-#{5 * $i} {
+    padding-bottom: (5px * $i);
+  }
+  .t-i-#{5 * $i} {
+    text-indent: (5px * $i);
+  }
+}
+.flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  &.r-reverse {
+    flex-direction: row-reverse;
+  }
+  // 左右布局 反方向
+  &.c-reverse {
+    flex-direction: column-reverse;
+  }
+  // 上下布局 反方向$peop
+  &.column {
+    flex-direction: column;
+  }
+  // 居左
+  &.start {
+    justify-content: flex-start;
+  }
+  // 居右
+  &.end {
+    justify-content: flex-end;
+  }
+  // 居中
+  &.around {
+    justify-content: space-around;
+  }
+  // 居中
+  &.center {
+    justify-content: center;
+  }
+  // 居中 容器之间有空白
+  &.between {
+    justify-content: space-between;
+  }
+  // 居中 容器左右有空白
+  &.evenly {
+    justify-content: space-evenly;
+  }
+  // 允许换行
+  &.wrap {
+    flex-wrap: wrap;
+  }
+  &.alignStart {
+    align-items: start;
+  }
+  // 超出换行
+  > .c-start {
+    align-self: start;
+  }
+  // 父集align-items不生效 改为start
+  > .x-flex-a {
+    flex: auto;
+    width: 10px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  > .x-auto {
+    flex: auto;
+  }
+  > .flex {
+    flex: 1;
+  }
+}
+
+.text-space1 {
+  letter-spacing: 1px;
+}
+.textcut {
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  //word-break: break-all
+}
+.font-weight {
+  font-weight: bold;
+}
+.textcut2 {
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+}
+.textcut3 {
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3;
+  word-break: break-all;
+}
+.textcut4 {
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 4;
+  word-break: break-all;
+}
