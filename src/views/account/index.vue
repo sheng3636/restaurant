@@ -42,11 +42,11 @@ export default {
     ...mapGetters(['menus']),
     subMenuItems() {
       let menus = []
-      let arr = this.menus.filter(item => item.path == 'account')[0].children
+      let arr = this.menus.filter(item => item.newPath == 'account')[0].children
       for (let i = 0; i < arr.length; i++) {
         const element = arr[i];
         menus.push({
-          index:element.path,
+          index:element.newPath,
           title:element.meta.title,
           icon:element.meta.icon
         })
@@ -55,7 +55,6 @@ export default {
     },
   },
   mounted () {
-    
   }
 }
 </script>

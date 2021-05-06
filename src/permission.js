@@ -36,14 +36,11 @@ const whiteList = ['/login','/404'] // 不需要重定向白名单
 router.beforeEach(async (to, from, next) => {
 
   function filterAsyncRouter(asyncRouterMap){
-   
     const accessedRouters = asyncRouterMap.filter(route => {
- 
       if (route.component === 'Layout') {//Layout组件特殊处理
         route.component = Layout
       } 
       else {
-        
         route.component = (resolve) => require(["@/views" + route.path + ".vue"], resolve)
       }
       if (route.children && route.children.length>0) {

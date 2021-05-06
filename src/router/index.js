@@ -39,7 +39,7 @@ export const constantRoutes = [{
   },
   {
     path: '/',
-    redirect: '/home',
+    redirect: '/index',
   },
   {
     path: '/',
@@ -48,14 +48,14 @@ export const constantRoutes = [{
       title: '整体页面布局'
     },
     children: [{
-        path: '/home',
+        path: '/index',
         component: () => import('@/views/index/index.vue'),
         meta: {
           title: '首页'
         },
-        redirect: '/Home', // 该配置是若点击选择父目录时，默认选中该父目录下的子路径页面
+        redirect: '/index', // 该配置是若点击选择父目录时，默认选中该父目录下的子路径页面
         children: [{
-          path: '/Home',
+          path: '/index',
           component: () => import('@/views/index/index.vue'),
           meta: {
             title: '首页'
@@ -226,10 +226,10 @@ export const constantRoutes = [{
       }
     ]
   },
-  {
-    path: '*',
-    redirect: '/404'
-  }
+  // {
+  //   path: '*',
+  //   redirect: '/404'
+  // }
 ]
 
 const createRouter = () => new Router({
